@@ -22,37 +22,22 @@
             color: var(--text); 
             font-family: 'Courier New', monospace;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0; padding: 20px;
+            position: relative; overflow: hidden;
         }
         
         .matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.1;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.1;
         }
-        
         .matrix-column {
-            position: absolute;
-            top: 0;
-            color: var(--primary);
-            font-size: 14px;
-            line-height: 1;
-            writing-mode: vertical-rl;
-            text-orientation: upright;
+            position: absolute; top: 0;
+            color: var(--primary); font-size: 14px; line-height: 1;
+            writing-mode: vertical-rl; text-orientation: upright;
             animation: matrix-fall linear infinite;
         }
-        
         @keyframes matrix-fall {
             from { transform: translateY(-100%); }
             to { transform: translateY(100vh); }
@@ -61,27 +46,19 @@
         .login-container {
             background: var(--card-bg);
             border: 2px solid var(--primary);
-            border-radius: 10px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-            z-index: 1;
+            border-radius: 10px; padding: 40px;
+            width: 100%; max-width: 400px;
+            position: relative; z-index: 1;
             box-shadow: 0 0 30px var(--primary);
             animation: pulse 3s infinite;
         }
-        
         @keyframes pulse {
             0% { box-shadow: 0 0 20px var(--primary); }
             50% { box-shadow: 0 0 40px var(--primary); }
             100% { box-shadow: 0 0 20px var(--primary); }
         }
         
-        .password-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 20px;
-        }
+        .password-container { position: relative; width: 100%; margin-bottom: 20px; }
         
         .login-input {
             width: 100%;
@@ -93,7 +70,6 @@
             font-family: 'Courier New', monospace;
             transition: all 0.3s;
         }
-        
         .login-input:focus {
             outline: none;
             border-color: var(--secondary);
@@ -101,38 +77,24 @@
         }
         
         .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
+            position: absolute; right: 12px; top: 50%;
             transform: translateY(-50%);
-            color: var(--primary);
-            cursor: pointer;
-            font-size: 18px;
-            opacity: 0.7;
-            transition: all 0.2s;
+            color: var(--primary); cursor: pointer;
+            font-size: 18px; opacity: 0.7; transition: all 0.2s;
         }
-        
-        .toggle-password:hover {
-            opacity: 1;
-        }
+        .toggle-password:hover { opacity: 1; }
         
         .login-button {
             width: 100%;
             background: transparent;
             border: 2px solid var(--primary);
             color: var(--primary);
-            padding: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
+            padding: 12px; font-size: 18px; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px;
+            cursor: pointer; transition: all 0.3s;
+            position: relative; overflow: hidden;
             font-family: 'Courier New', monospace;
         }
-        
         .login-button:hover {
             background: var(--primary);
             color: var(--bg);
@@ -140,49 +102,34 @@
         }
         
         .error-message {
-            color: var(--danger);
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 14px;
+            color: var(--danger); text-align: center;
+            margin-bottom: 20px; font-size: 14px;
             border: 1px solid var(--danger);
-            padding: 10px;
-            border-radius: 5px;
+            padding: 10px; border-radius: 5px;
             background: rgba(255,0,0,0.1);
         }
         
         .terminal-line {
-            display: flex;
-            align-items: center;
+            display: flex; align-items: center;
             margin-bottom: 20px;
-            color: var(--text);
-            font-size: 14px;
+            color: var(--text); font-size: 14px;
         }
-        
-        .terminal-prompt {
-            color: var(--primary);
-            margin-right: 10px;
-        }
+        .terminal-prompt { color: var(--primary); margin-right: 10px; }
         
         .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 20px;
+            display: inline-block; width: 10px; height: 20px;
             background: var(--primary);
             animation: blink 1s infinite;
             margin-left: 5px;
         }
-        
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
         
         .theme-indicator {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 10px;
-            opacity: 0.5;
+            position: absolute; top: 10px; right: 10px;
+            font-size: 10px; opacity: 0.5;
         }
     </style>
 </head>
@@ -212,13 +159,9 @@
         
         <form method="POST" action="/login" id="loginForm">
             <div class="password-container">
-                <input type="password" 
-                       name="password" 
-                       id="password"
-                       class="login-input" 
-                       placeholder="Enter Access Password"
-                       required
-                       autofocus>
+                <input type="password" name="password" id="password"
+                       class="login-input" placeholder="Enter Access Password"
+                       required autofocus>
                 <i class="fas fa-eye toggle-password" onclick="togglePassword()" id="toggleIcon"></i>
             </div>
             
@@ -238,14 +181,12 @@
         function createMatrix() {
             const matrix = document.getElementById('matrix');
             const columns = Math.floor(window.innerWidth / 20);
-            
             for (let i = 0; i < columns; i++) {
                 const column = document.createElement('div');
                 column.className = 'matrix-column';
                 column.style.left = i * 20 + 'px';
                 column.style.animationDuration = Math.random() * 5 + 3 + 's';
                 column.style.animationDelay = Math.random() * 5 + 's';
-                
                 const chars = '01アイウエオカキクケコサシスセソタチツテト';
                 let text = '';
                 for (let j = 0; j < 20; j++) {
@@ -265,7 +206,6 @@
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('toggleIcon');
-            
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleIcon.classList.remove('fa-eye');

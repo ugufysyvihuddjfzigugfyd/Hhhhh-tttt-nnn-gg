@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config.site_title }} - {{ server_id }} Offline</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: {{ config.colors[config.theme].primary }};
+            --secondary: {{ config.colors[config.theme].secondary }};
+            --accent: {{ config.colors[config.theme].accent }};
+            --bg: {{ config.colors[config.theme].background }};
+            --card-bg: {{ config.colors[config.theme].card_bg }};
+            --text: #ffffff;
+            --danger: {{ config.colors[config.theme].danger }};
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Matrix background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.08;
+        }
+        .matrix-column {
+            position: absolute;
+            top: 0;
+            color: var(--primary);
+            font-size: 14px;
+            line-height: 1;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            animation: matrix-fall linear infinite;
+        }
+        @keyframes matrix-fall {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(100vh); }
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 1;
+            background: var(--card-bg);
+            border: 2px solid var(--danger);
+            border-radius: 16px;
+            padding: 40px 35px;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 40px var(--danger), 0 0 80px rgba(255, 0, 0, 0.2);
+            animation: pulseRed 3s infinite;
+        }
+
+        @keyframes pulseRed {
+            0%, 100% { box-shadow: 0 0 30px var(--danger), 0 0 60px rgba(255, 0, 0, 0.15); }
+            50% { box-shadow: 0 0 50px var(--danger), 0 0 100px rgba(255, 0, 0, 0.3); }
+        }
+
+        /* Offline icon */
+        .offline-icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            color: var(--danger);
+            animation: pulseIcon 2s infinite;
+        }
+
+        @keyframes pulseIcon {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        /* Title */
+        h1 {
+            font-size: 22px;
+            letter-spacing: 3px;
+            color: var(--danger);
+            margin: 0 0 10px;
+            text-transform: uppercase;
+        }
+
+        .server-name {
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 15px 0 20px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            word-break: break-all;
+        }
+
+        /* Status text */
+        .status-text {
+            font-size: 14px;
+            color: var(--text);
+            opacity: 0.85;
+            line-height: 1.7;
+            margin: 8px 0;
+        }
+
+        .status-text strong {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .hint-box {
+            margin-top: 20px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.35);
+            border-left: 3px solid var(--primary);
+            border-radius: 6px;
+            text-align: left;
+            font-size: 12px;
+            color: var(--text);
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .hint-box i {
+            color: var(--primary);
+            margin-right: 6px;
+        }
+
+        /* Blinking dot */
+        .blink-dot {
+            display: inline-block;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.2; }
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.25s ease;
+            border: 2px solid;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .btn-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .btn-primary:hover {
+            background: var(--primary);
+            color: var(--bg);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .btn-danger {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+            box-shadow: 0 0 20px var(--danger);
+        }
+
+        /* Auto refresh counter */
+        .refresh-counter {
+            margin-top: 20px;
+            font-size: 11px;
+            opacity: 0.6;
+            color: var(--text);
+        }
+
+        .refresh-counter span {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container { padding: 30px 20px; }
+            h1 { font-size: 18px; }
+            .server-name { font-size: 20px; }
+            .offline-icon { width: 70px; height: 70px; font-size: 34px; }
+            .btn { padding: 10px 16px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg" id="matrix"></div>
+
+    <div class="container">
+        <div class="offline-icon">
+            <i class="fas fa-power-off"></i>
+        </div>
+
+        <h1>
+            <span class="blink-dot">●</span>
+            SERVER OFFLINE
+        </h1>
+
+        <div class="server-name">
+            {{ server_id }}
+        </div>
+
+        {% if reason == 'stopped' %}
+        <p class="status-text">
+            This server is currently <strong>STOPPED</strong>.
+        </p>
+        <p class="status-text">
+            Start it from the dashboard to bring it online.
+        </p>
+        <div class="hint-box">
+            <i class="fas fa-info-circle"></i>
+            Go to the dashboard and click the <strong style="color: var(--primary);">power button</strong>
+            to start this server.
+        </div>
+
+        {% elif reason == 'no_port' %}
+        <p class="status-text">
+            The server is running but <strong>not listening on any port</strong> yet.
+        </p>
+        <p class="status-text">
+            Waiting for the app to bind to a network port...
+        </p>
+        <div class="hint-box">
+            <i class="fas fa-lightbulb"></i>
+            Make sure your app is listening on <strong style="color: var(--primary);">0.0.0.0</strong>
+            or <strong style="color: var(--primary);">127.0.0.1</strong> on some port (e.g. 8080, 5000, 3000).
+        </div>
+
+        {% elif reason == 'not_responding' %}
+        <p class="status-text">
+            The server process is running but <strong>not responding</strong>.
+        </p>
+        <p class="status-text">
+            It may have crashed or be stuck in an error.
+        </p>
+        <div class="hint-box">
+            <i class="fas fa-exclamation-triangle"></i>
+            Check the <strong style="color: var(--primary);">Live Logs</strong>
+            on the dashboard to see what went wrong.
+        </div>
+
+        {% else %}
+        <p class="status-text">
+            This server is currently <strong>unavailable</strong>.
+        </p>
+        {% endif %}
+
+        <div class="btn-group">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+            <a href="javascript:location.reload()" class="btn btn-danger">
+                <i class="fas fa-sync"></i> Retry Now
+            </a>
+        </div>
+
+        <div class="refresh-counter">
+            Auto-refresh in <span id="countdown">5</span>s
+        </div>
+    </div>
+
+    <script>
+        // Matrix background effect
+        function createMatrix() {
+            const matrix = document.getElementById('matrix');
+            if (!matrix) return;
+            matrix.innerHTML = '';
+            const columns = Math.floor(window.innerWidth / 20);
+
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = i * 20 + 'px';
+                column.style.animationDuration = (Math.random() * 5 + 3) + 's';
+                column.style.animationDelay = (Math.random() * 5) + 's';
+
+                const chars = '01アイウエオカキクケコサシスセソタチツテト';
+                let text = '';
+                for (let j = 0; j < 20; j++) {
+                    text += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+                }
+                column.innerHTML = text;
+                matrix.appendChild(column);
+            }
+        }
+        createMatrix();
+        window.addEventListener('resize', createMatrix);
+
+        // Auto-refresh with countdown
+        let countdownValue = 5;
+        const countdownEl = document.getElementById('countdown');
+
+        const ticker = setInterval(() => {
+            countdownValue--;
+            if (countdownEl) countdownEl.textContent = countdownValue;
+            if (countdownValue <= 0) {
+                clearInterval(ticker);
+                location.reload();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -20,48 +20,36 @@
             --stats-text: #ffffff;
             --font-family: {{ config.fonts[config.font_family] }};
         }
-        
-        body { 
-            background-color: var(--bg); 
-            color: var(--text); 
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
             font-family: var(--font-family);
             padding-bottom: 80px;
             transition: background-color 0.3s ease, color 0.3s ease;
             min-height: 100vh;
         }
-        
-        .header-text {
-            color: var(--header-text);
-        }
-        
-        .stats-text {
-            color: var(--stats-text);
-        }
-        
-        .theme-gradient { 
-            background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent)); 
-        }
-        .theme-gradient-hover:hover { 
-            background: linear-gradient(to right, var(--accent), var(--secondary), var(--primary)); 
-        }
-        .theme-active-border { 
-            border-bottom: 2px solid var(--primary); 
-            color: var(--primary); 
-        }
-        
-        .card-bg { 
-            background: var(--card-bg); 
+
+        .header-text { color: var(--header-text); }
+        .stats-text { color: var(--stats-text); }
+
+        .theme-gradient { background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent)); }
+        .theme-gradient-hover:hover { background: linear-gradient(to right, var(--accent), var(--secondary), var(--primary)); }
+        .theme-active-border { border-bottom: 2px solid var(--primary); color: var(--primary); }
+
+        .card-bg {
+            background: var(--card-bg);
             border: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 0 15px rgba(0,0,0,0.3);
         }
-        
+
         .custom-scroll::-webkit-scrollbar { width: 5px; }
         .custom-scroll::-webkit-scrollbar-track { background: var(--bg); }
         .custom-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
-        
+
         .modal-enter { animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
+
         .fab { animation: bounceIn 0.5s; }
         @keyframes bounceIn {
             0% { transform: scale(0); }
@@ -85,11 +73,8 @@
             box-shadow: 5px 0 30px rgba(0,0,0,0.5);
             overflow-y: auto;
         }
-        
-        .sidebar.open {
-            left: 0;
-        }
-        
+        .sidebar.open { left: 0; }
+
         .sidebar-overlay {
             position: fixed;
             inset: 0;
@@ -97,11 +82,8 @@
             z-index: 999;
             display: none;
         }
-        
-        .sidebar-overlay.open {
-            display: block;
-        }
-        
+        .sidebar-overlay.open { display: block; }
+
         .menu-item {
             padding: 15px 20px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -113,31 +95,29 @@
             gap: 15px;
             font-size: 14px;
         }
-        
         .menu-item:hover {
             background: rgba(0,0,0,0.2);
             border-left: 3px solid var(--primary);
         }
-        
         .menu-item.active {
             background: rgba(0,0,0,0.3);
             border-left: 3px solid var(--primary);
         }
-        
-        .dropdown-menu { 
-            display: none; 
-            position: absolute; 
-            right: 0; 
-            top: 100%; 
-            background: var(--card-bg); 
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--card-bg);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px; 
-            z-index: 10; 
+            border-radius: 8px;
+            z-index: 10;
             min-width: 200px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
         .dropdown:hover .dropdown-menu { display: block; }
-        
+
         .dropdown-menu button, .dropdown-menu a {
             width: 100%;
             text-align: left;
@@ -151,19 +131,13 @@
             align-items: center;
             gap: 10px;
         }
-        
         .dropdown-menu button:hover, .dropdown-menu a:hover {
             background: rgba(0,0,0,0.3);
             color: var(--primary);
         }
 
-        .main-view {
-            display: none;
-        }
-        
-        .main-view.active {
-            display: block;
-        }
+        .main-view { display: none; }
+        .main-view.active { display: block; }
 
         .matrix-bg {
             position: fixed;
@@ -175,7 +149,6 @@
             z-index: -1;
             opacity: 0.03;
         }
-        
         .matrix-column {
             position: absolute;
             top: 0;
@@ -186,7 +159,6 @@
             text-orientation: upright;
             animation: matrix-fall linear infinite;
         }
-        
         @keyframes matrix-fall {
             from { transform: translateY(-100%); }
             to { transform: translateY(100vh); }
@@ -200,26 +172,19 @@
             border: 2px solid transparent;
             transition: all 0.2s;
         }
-        
         .color-dot:hover {
             transform: scale(1.2);
             border-color: white;
             box-shadow: 0 0 15px currentColor;
         }
 
-        .server-card {
-            animation: fadeIn 0.5s;
-        }
-        
+        .server-card { animation: fadeIn 0.5s; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .stats-number {
-            color: var(--stats-text);
-            font-weight: bold;
-        }
+        .stats-number { color: var(--stats-text); font-weight: bold; }
 
         .password-toggle {
             position: absolute;
@@ -231,12 +196,8 @@
             opacity: 0.7;
             transition: opacity 0.2s;
         }
-        
-        .password-toggle:hover {
-            opacity: 1;
-        }
+        .password-toggle:hover { opacity: 1; }
 
-        /* File list styles */
         .file-item {
             background: rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.1);
@@ -244,26 +205,22 @@
             margin-bottom: 2px;
             color: #ffffff;
         }
-        
         .file-item:hover {
             background: rgba(0,0,0,0.5);
             border-color: var(--primary);
         }
-        
         .file-size {
             font-size: 12px;
             color: #ffffff;
             opacity: 0.8;
             font-weight: 500;
         }
-        
         .folder-size {
             font-size: 11px;
             color: #ffffff;
             opacity: 0.6;
             font-style: italic;
         }
-
         .total-size {
             font-size: 13px;
             color: #ffffff;
@@ -276,14 +233,85 @@
             text-align: center;
             border: 1px solid rgba(255,255,255,0.1);
         }
+        .file-icon { color: #ffffff; opacity: 0.8; }
+        .file-name { color: #ffffff; }
 
-        .file-icon {
-            color: #ffffff;
-            opacity: 0.8;
+        /* === POWER BUTTON === */
+        .power-btn {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+            border: 2px solid;
+            background: transparent;
+        }
+        .power-btn.running {
+            background: rgba(0,255,0,0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 20px var(--primary);
+            animation: powerPulse 2s infinite;
+        }
+        .power-btn.stopped {
+            background: rgba(255,0,0,0.1);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .power-btn:hover { transform: scale(1.1); }
+        @keyframes powerPulse {
+            0%, 100% { box-shadow: 0 0 15px var(--primary); }
+            50% { box-shadow: 0 0 30px var(--primary), 0 0 50px var(--primary); }
         }
 
-        .file-name {
-            color: #ffffff;
+        /* === LIVE BADGE === */
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255,0,0,0.15);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .live-badge:hover {
+            background: var(--danger);
+            color: #fff;
+            box-shadow: 0 0 15px var(--danger);
+        }
+        .live-badge .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulseRed 1.5s infinite;
+        }
+        @keyframes pulseRed {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* === FULLSCREEN LOG MODAL === */
+        #fslogModal { z-index: 9999; }
+        #fslog-content {
+            background: #000;
+            color: var(--primary);
+            border-top: 1px solid var(--primary);
+            font-size: 12px;
+            line-height: 1.4;
+            user-select: text;
         }
     </style>
 </head>
@@ -297,32 +325,32 @@
             <h2 class="text-xl font-bold mt-2 header-text">{{ config.site_header }}</h2>
             <p class="text-xs mt-2 opacity-50">{{ config.theme|upper }} MODE</p>
         </div>
-        
-        <div class="menu-item active" onclick="switchMainView('dashboard')">
+
+        <div class="menu-item active" onclick="switchMainView('dashboard', this)">
             <i class="fas fa-tachometer-alt w-5"></i>
             <span>Dashboard</span>
         </div>
-        
-        <div class="menu-item" onclick="switchMainView('theme')">
+
+        <div class="menu-item" onclick="switchMainView('theme', this)">
             <i class="fas fa-palette w-5"></i>
             <span>Theme Customizer</span>
         </div>
-        
-        <div class="menu-item" onclick="switchMainView('packages')">
+
+        <div class="menu-item" onclick="switchMainView('packages', this)">
             <i class="fas fa-cubes w-5"></i>
             <span>Package Manager</span>
         </div>
-        
-        <div class="menu-item" onclick="switchMainView('telegram')">
+
+        <div class="menu-item" onclick="switchMainView('telegram', this)">
             <i class="fab fa-telegram w-5"></i>
             <span>Telegram Bot</span>
         </div>
-        
-        <div class="menu-item" onclick="switchMainView('settings')">
+
+        <div class="menu-item" onclick="switchMainView('settings', this)">
             <i class="fas fa-cog w-5"></i>
             <span>Settings</span>
         </div>
-        
+
         <div class="menu-item" onclick="location.href='/logout'">
             <i class="fas fa-sign-out-alt w-5"></i>
             <span>Logout</span>
@@ -341,12 +369,13 @@
                 </div>
             </div>
             <div class="text-[10px] font-mono stats-text">
-                CPU: <span id="cpu-usage" class="stats-number">{{ cpu }}%</span> | 
+                CPU: <span id="cpu-usage" class="stats-number">{{ cpu }}%</span> |
                 RAM: <span id="ram-usage" class="stats-number">{{ ram }}%</span>
             </div>
         </div>
     </div>
 
+    <!-- ============ DASHBOARD VIEW ============ -->
     <div id="dashboard-view" class="main-view active">
         <div class="px-4 mt-6 grid grid-cols-2 gap-3">
             <div class="card-bg p-4 rounded-xl flex flex-col items-center">
@@ -362,68 +391,86 @@
         <div class="px-4 mt-8 space-y-4">
             {% for id, s in servers.items() %}
             <div class="card-bg rounded-2xl overflow-hidden shadow-lg relative group server-card">
-                <div class="absolute left-0 top-0 bottom-0 w-1" style="background: {{ 'var(--primary)' if s.status == 'running' else 'var(--danger)' }};"></div>
-                
-                <div class="p-5 pl-7">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="font-bold text-lg text-white">{{ id }}</h3>
-                            <p class="text-[10px] opacity-50 font-mono mt-1">{{ s.cmd }}</p>
+                <div class="absolute left-0 top-0 bottom-0 w-1"
+                     style="background: {{ 'var(--primary)' if s.status == 'running' else 'var(--danger)' }};"></div>
+
+                <div class="p-4 pl-5">
+                    <div class="flex items-start gap-4">
+                        <button class="power-btn {{ 'running' if s.status == 'running' else 'stopped' }}"
+                                onclick="togglePower('{{ id }}', '{{ s.status }}', this)"
+                                title="{{ 'Stop' if s.status == 'running' else 'Start' }}">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-lg text-white truncate">{{ id }}</h3>
+                            <p class="text-[10px] opacity-50 font-mono mt-1 truncate">{{ s.cmd }}</p>
+
+                            {% if s.status == 'running' and s.port %}
+                            <a href="/{{ id }}" target="_blank" class="live-badge">
+                                <span class="pulse-dot"></span>
+                                LIVE at /{{ id }} :{{ s.port }}
+                            </a>
+                            {% elif s.status == 'running' %}
+                            <span class="inline-block mt-2 text-[10px] opacity-50 font-mono">
+                                ⏳ Waiting for port...
+                            </span>
+                            {% endif %}
                         </div>
-                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider" 
-                              style="background: rgba(0,0,0,0.3); color: {{ 'var(--primary)' if s.status == 'running' else 'var(--danger)' }}; border: 1px solid {{ 'var(--primary)' if s.status == 'running' else 'var(--danger)' }};">
+
+                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider flex-shrink-0"
+                              style="background: rgba(0,0,0,0.3);
+                                     color: {{ 'var(--primary)' if s.status == 'running' else 'var(--danger)' }};
+                                     border: 1px solid {{ 'var(--primary)' if s.status == 'running' else 'var(--danger)' }};">
                             {{ s.status }}
                         </span>
                     </div>
 
-                    <div class="grid grid-cols-4 gap-2">
-                        {% if s.status == 'running' %}
-                        <a href="/action/{{ id }}/stop" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: var(--danger); border: 1px solid var(--danger);">
-                            <i class="fas fa-stop"></i>
-                        </a>
-                        <a href="/action/{{ id }}/restart" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: yellow; border: 1px solid yellow;">
-                            <i class="fas fa-sync"></i>
-                        </a>
-                        {% else %}
-                        <a href="/action/{{ id }}/start" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: var(--primary); border: 1px solid var(--primary);">
-                            <i class="fas fa-play"></i>
-                        </a>
-                        <a href="/action/{{ id }}/delete" onclick="return confirm('Delete this server?')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: var(--danger); border: 1px solid var(--danger);">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                        {% endif %}
-                        <button onclick="toggleLog('{{ id }}')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: cyan; border: 1px solid cyan;">
-                            <i class="fas fa-eye"></i>
+                    <div class="grid grid-cols-4 gap-2 mt-4">
+                        <button onclick="openFullscreenLog('{{ id }}')"
+                                class="hover:bg-opacity-20 rounded-lg py-2 flex flex-col items-center transition"
+                                style="background: rgba(0,0,0,0.3); color: cyan; border: 1px solid cyan;">
+                            <i class="fas fa-eye mb-1"></i>
+                            <span class="text-[9px]">Live Logs</span>
                         </button>
-                        <button onclick="openSettings('{{ id }}')" class="hover:bg-opacity-20 rounded-lg py-2 flex justify-center transition" style="background: rgba(0,0,0,0.3); color: magenta; border: 1px solid magenta;">
-                            <i class="fas fa-cog"></i>
+                        <button onclick="openSettings('{{ id }}')"
+                                class="hover:bg-opacity-20 rounded-lg py-2 flex flex-col items-center transition"
+                                style="background: rgba(0,0,0,0.3); color: magenta; border: 1px solid magenta;">
+                            <i class="fas fa-cog mb-1"></i>
+                            <span class="text-[9px]">Settings</span>
                         </button>
-                    </div>
-
-                    <div id="log-box-{{ id }}" class="hidden mt-4 pt-3 border-t" style="border-color: var(--primary);">
-                        <div class="flex justify-end mb-1">
-                            <button onclick="copyLog('log-{{ id }}')" class="bg-black/50 hover:bg-black/80 rounded px-2 py-1 text-xs text-white opacity-40 hover:opacity-100 transition" title="Copy all logs">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <pre id="log-{{ id }}" class="bg-black p-3 rounded-lg text-[11px] h-32 overflow-y-auto custom-scroll font-mono leading-tight log-text" style="color: var(--primary);">Waiting for logs...</pre>
+                        <a href="/action/{{ id }}/restart"
+                           class="hover:bg-opacity-20 rounded-lg py-2 flex flex-col items-center transition"
+                           style="background: rgba(0,0,0,0.3); color: yellow; border: 1px solid yellow;">
+                            <i class="fas fa-sync mb-1"></i>
+                            <span class="text-[9px]">Restart</span>
+                        </a>
+                        <a href="/action/{{ id }}/delete"
+                           onclick="return confirm('Delete {{ id }}?')"
+                           class="hover:bg-opacity-20 rounded-lg py-2 flex flex-col items-center transition"
+                           style="background: rgba(0,0,0,0.3); color: var(--danger); border: 1px solid var(--danger);">
+                            <i class="fas fa-trash mb-1"></i>
+                            <span class="text-[9px]">Delete</span>
+                        </a>
                     </div>
                 </div>
             </div>
             {% endfor %}
-            
+
             {% if total_count == 0 %}
             <div class="text-center py-10 opacity-50">
                 <img src="{{ config.icon_url }}" alt="icon" class="w-16 h-16 mx-auto mb-2" style="filter: drop-shadow(0 0 10px var(--primary));">
                 <p class="text-xs">No servers deployed</p>
+                <p class="text-[10px] mt-2">Click the + button to deploy your first server</p>
             </div>
             {% endif %}
         </div>
     </div>
 
+    <!-- ============ THEME VIEW ============ -->
     <div id="theme-view" class="main-view px-4 py-6">
         <h2 class="text-xl font-bold mb-6 header-text">Theme Customizer</h2>
-        
+
         <div class="card-bg p-6 rounded-xl space-y-6">
             <div>
                 <label class="block text-sm mb-2 opacity-70 stats-text">Color Theme</label>
@@ -440,7 +487,7 @@
                     <option value="silver" {% if config.theme == 'silver' %}selected{% endif %}>⚙️ Silver Grey</option>
                 </select>
             </div>
-            
+
             <div>
                 <label class="block text-sm mb-2 opacity-70 stats-text">Font Style</label>
                 <select id="font-family" class="w-full bg-black border p-3 rounded-lg" style="border-color: var(--primary); color: var(--text);">
@@ -451,7 +498,7 @@
                     <option value="retro" {% if config.font_family == 'retro' %}selected{% endif %}>📟 Retro</option>
                 </select>
             </div>
-            
+
             <div class="grid grid-cols-5 gap-3 mt-4">
                 <div class="text-center">
                     <div class="color-dot mx-auto" style="background: #00ff00;" onclick="previewTheme('matrix')" title="Matrix Green"></div>
@@ -494,16 +541,26 @@
                     <span class="text-[8px] mt-1 block opacity-50">Silver</span>
                 </div>
             </div>
-            
+
+            <div>
+                <label class="block text-sm mb-2 opacity-70 stats-text">Admin Password (Required)</label>
+                <div class="relative">
+                    <input type="password" id="theme-admin-password" placeholder="Enter Admin Password"
+                           class="w-full bg-black border p-3 rounded-lg pr-10" style="border-color: var(--primary); color: var(--text);">
+                    <i class="fas fa-eye password-toggle" onclick="togglePasswordField('theme-admin-password', this)"></i>
+                </div>
+            </div>
+
             <button onclick="saveTheme()" class="w-full theme-gradient theme-gradient-hover text-white font-bold py-3 rounded-xl transition">
                 <i class="fas fa-save mr-2"></i> APPLY THEME
             </button>
         </div>
     </div>
 
+    <!-- ============ PACKAGES VIEW ============ -->
     <div id="packages-view" class="main-view px-4 py-6">
         <h2 class="text-xl font-bold mb-6 header-text">Package Manager</h2>
-        
+
         <div class="card-bg p-6 rounded-xl space-y-6">
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <select id="global-pkg-type" class="bg-black border p-3 rounded-lg" style="border-color: var(--primary); color: var(--text);">
@@ -514,7 +571,7 @@
                 </select>
                 <input id="global-pkg-name" placeholder="package name" class="bg-black border p-3 rounded-lg" style="border-color: var(--primary); color: var(--text);">
             </div>
-            
+
             <div class="flex gap-3">
                 <button onclick="globalPackageAction('install')" class="flex-1 py-3 rounded-lg transition" style="background: rgba(0,0,0,0.3); color: var(--primary); border: 1px solid var(--primary);">
                     <i class="fas fa-download mr-2"></i> INSTALL
@@ -523,24 +580,25 @@
                     <i class="fas fa-trash-alt mr-2"></i> UNINSTALL
                 </button>
             </div>
-            
+
             <div class="bg-black/50 p-4 rounded-lg text-xs">
                 <i class="fas fa-info-circle mr-2" style="color: var(--primary);"></i>
-                Select a server from dashboard to run package commands
+                Select a server from dashboard to run package commands on it.
             </div>
         </div>
     </div>
 
+    <!-- ============ TELEGRAM VIEW ============ -->
     <div id="telegram-view" class="main-view px-4 py-6">
         <h2 class="text-xl font-bold mb-6 header-text">Telegram Bot Hosting</h2>
-        
+
         <div class="card-bg p-6 rounded-xl space-y-6">
             <div>
                 <label class="block text-sm mb-2 opacity-70 stats-text">Bot Token</label>
-                <input type="text" id="bot-token" placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz" 
+                <input type="text" id="bot-token" placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
                        class="w-full bg-black border p-3 rounded-lg font-mono" style="border-color: var(--primary); color: var(--text);">
             </div>
-            
+
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="deployTelegramBot()" class="py-3 rounded-lg transition" style="background: rgba(0,0,0,0.3); color: var(--primary); border: 1px solid var(--primary);">
                     <i class="fab fa-telegram mr-2"></i> DEPLOY BOT
@@ -549,60 +607,59 @@
                     <i class="fas fa-external-link-alt mr-2"></i> @BotFather
                 </button>
             </div>
-            
+
             <div class="bg-black/50 p-4 rounded-lg text-xs space-y-2">
                 <p><i class="fas fa-check-circle mr-2" style="color: var(--primary);"></i> Auto-restart enabled (24h)</p>
                 <p><i class="fas fa-check-circle mr-2" style="color: var(--primary);"></i> TeleBot 4.14.1 included</p>
                 <p><i class="fas fa-check-circle mr-2" style="color: var(--primary);"></i> Commands: /start, /help, /api, /ping, /uptime, /info</p>
-                <p><i class="fas fa-check-circle mr-2" style="color: var(--primary);"></i> API endpoint checker with JSON format</p>
             </div>
         </div>
     </div>
 
+    <!-- ============ SETTINGS VIEW ============ -->
     <div id="settings-view" class="main-view px-4 py-6">
         <h2 class="text-xl font-bold mb-6 header-text">Settings</h2>
-        
+
         <div class="card-bg p-6 rounded-xl space-y-6">
             <div>
                 <label class="block text-sm mb-2 opacity-70 stats-text">Site Title</label>
-                <input type="text" id="site-title" value="{{ config.site_title }}" 
+                <input type="text" id="site-title" value="{{ config.site_title }}"
                        class="w-full bg-black border p-3 rounded-lg" style="border-color: var(--primary); color: var(--text);">
             </div>
-            
+
             <div>
                 <label class="block text-sm mb-2 opacity-70 stats-text">Site Header</label>
-                <input type="text" id="site-header" value="{{ config.site_header }}" 
+                <input type="text" id="site-header" value="{{ config.site_header }}"
                        class="w-full bg-black border p-3 rounded-lg" style="border-color: var(--primary); color: var(--text);">
             </div>
-            
+
             <div>
                 <label class="block text-sm mb-2 opacity-70 stats-text">Icon URL</label>
-                <input type="text" id="icon-url" value="{{ config.icon_url }}" 
+                <input type="text" id="icon-url" value="{{ config.icon_url }}"
                        class="w-full bg-black border p-3 rounded-lg" style="border-color: var(--primary); color: var(--text);">
                 <p class="text-xs mt-1 opacity-50">Use direct image URL or /static/icon.png</p>
             </div>
-            
+
             <div>
                 <label class="block text-sm mb-2 opacity-70 stats-text">Admin Password (Required to save)</label>
                 <div class="relative">
-                    <input type="password" id="admin-password-settings" placeholder="Enter Admin Password" 
+                    <input type="password" id="admin-password-settings" placeholder="Enter Admin Password"
                            class="w-full bg-black border p-3 rounded-lg pr-10" style="border-color: var(--primary); color: var(--text);">
                     <i class="fas fa-eye password-toggle" onclick="togglePasswordField('admin-password-settings', this)"></i>
                 </div>
-                <p class="text-xs mt-1 opacity-50">Admin password is required to change title, header, or icon.</p>
             </div>
-            
+
             <hr class="border-opacity-20" style="border-color: var(--primary);">
-            
+
             <div>
                 <label class="block text-sm mb-2 opacity-70 stats-text">Change User Password</label>
                 <div class="relative mb-3">
-                    <input type="password" id="current-password" placeholder="Enter Admin Password" 
+                    <input type="password" id="current-password" placeholder="Enter Admin Password"
                            class="w-full bg-black border p-3 rounded-lg pr-10" style="border-color: var(--primary); color: var(--text);">
                     <i class="fas fa-eye password-toggle" onclick="togglePasswordField('current-password', this)"></i>
                 </div>
                 <div class="relative">
-                    <input type="password" id="new-password" placeholder="New User Password" 
+                    <input type="password" id="new-password" placeholder="New User Password"
                            class="w-full bg-black border p-3 rounded-lg pr-10" style="border-color: var(--primary); color: var(--text);">
                     <i class="fas fa-eye password-toggle" onclick="togglePasswordField('new-password', this)"></i>
                 </div>
@@ -611,9 +668,9 @@
                 </button>
                 <p class="text-xs mt-2 opacity-50 stats-text">Note: Only Admin can change password</p>
             </div>
-            
+
             <hr class="border-opacity-20" style="border-color: var(--primary);">
-            
+
             <button onclick="saveSettings()" class="w-full theme-gradient theme-gradient-hover text-white font-bold py-3 rounded-xl transition">
                 <i class="fas fa-save mr-2"></i> SAVE ALL SETTINGS
             </button>
@@ -624,6 +681,7 @@
         <i class="fas fa-plus"></i>
     </button>
 
+    <!-- ============ CREATE SERVER MODAL ============ -->
     <div id="createModal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center">
         <div class="card-bg w-full sm:w-96 rounded-t-3xl sm:rounded-2xl p-6 modal-enter">
             <div class="flex justify-between items-center mb-6">
@@ -631,19 +689,21 @@
                 <button onclick="toggleModal(false)" class="opacity-50 hover:opacity-100"><i class="fas fa-times"></i></button>
             </div>
             <form action="/create_server" method="POST" enctype="multipart/form-data" class="space-y-4">
-                <input type="text" name="server_name" placeholder="Name (e.g. MusicBot)" class="w-full bg-black border p-3 rounded-xl text-white focus:outline-none" style="border-color: var(--primary);" required>
-                <input type="text" name="start_command" placeholder="Command (e.g. python3 bot.py)" class="w-full bg-black border p-3 rounded-xl text-white focus:outline-none" style="border-color: var(--primary);" required>
+                <input type="text" name="server_name" placeholder="Name (e.g. MAHIR JOD)" class="w-full bg-black border p-3 rounded-xl text-white focus:outline-none" style="border-color: var(--primary);" required>
+                <input type="text" name="start_command" placeholder="Command (e.g. python3 app.py)" class="w-full bg-black border p-3 rounded-xl text-white focus:outline-none" style="border-color: var(--primary);" required>
                 <div class="border border-dashed rounded-xl p-4 text-center" style="border-color: var(--primary);">
                     <input type="file" name="file" class="text-xs">
                 </div>
+                <p class="text-[10px] opacity-60">Name will be auto-formatted: "MAHIR JOD" → "MAHIRJOD"</p>
                 <button type="submit" class="w-full theme-gradient theme-gradient-hover text-white font-bold py-3 rounded-xl transition">Create & Start</button>
             </form>
         </div>
     </div>
 
+    <!-- ============ MANAGE SERVER MODAL ============ -->
     <div id="manageModal" class="hidden fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="card-bg w-full max-w-2xl h-[80vh] rounded-2xl flex flex-col modal-enter">
-            
+
             <div class="p-4 border-b flex justify-between items-center" style="border-color: var(--primary);">
                 <div>
                     <h3 class="text-white font-bold text-lg" id="manage-title">Server Manager</h3>
@@ -651,7 +711,7 @@
                 </div>
                 <button onclick="closeSettings()" class="opacity-50 hover:opacity-100"><i class="fas fa-times text-xl"></i></button>
             </div>
-            
+
             <div class="flex border-b" style="border-color: var(--primary);">
                 <button onclick="switchTab('console')" id="tab-console" class="flex-1 py-3 text-sm font-bold theme-active-border">CONSOLE</button>
                 <button onclick="switchTab('files')" id="tab-files" class="flex-1 py-3 text-sm font-bold opacity-50 hover:opacity-100">FILES</button>
@@ -707,7 +767,7 @@
 
                 <div id="view-packages" class="hidden absolute inset-0 p-6 overflow-y-auto custom-scroll">
                     <label class="block text-xs uppercase tracking-widest mb-2 opacity-70 stats-text">Package Name</label>
-                    
+
                     <div class="flex flex-col sm:flex-row gap-3 mb-4">
                         <select id="pkg-type" class="w-full sm:w-32 bg-black border p-3 rounded-xl outline-none" style="border-color: var(--primary); color: var(--text);">
                             <option value="pip">PIP</option>
@@ -717,7 +777,7 @@
                         </select>
                         <input id="pkg-name" placeholder="e.g. requests" class="flex-1 bg-black border p-3 rounded-xl outline-none" style="border-color: var(--primary); color: var(--text);">
                     </div>
-                    
+
                     <div class="flex gap-3 mb-6">
                         <button onclick="packageAction('install')" class="flex-1 py-3 rounded-xl transition" style="background: rgba(0,0,0,0.3); color: var(--primary); border: 1px solid var(--primary);">
                             <i class="fas fa-download mr-2"></i> INSTALL
@@ -731,12 +791,12 @@
                 <div id="view-config" class="hidden absolute inset-0 p-6 overflow-y-auto custom-scroll">
                     <label class="block text-xs uppercase tracking-widest mb-2 opacity-70 stats-text">Start Command</label>
                     <input id="config-cmd" class="w-full bg-black border p-3 rounded-xl mb-4 outline-none" style="border-color: var(--primary); color: var(--text);" value="">
-                    
+
                     <label class="block text-xs uppercase tracking-widest mb-2 opacity-70 stats-text">Working Directory</label>
                     <input id="config-cwd" placeholder="Folder name" class="w-full bg-black border p-3 rounded-xl mb-6 outline-none" style="border-color: var(--primary); color: var(--text);" value="">
-                    
+
                     <hr class="border-opacity-20 mb-6" style="border-color: var(--primary);">
-                    
+
                     <label class="block text-xs uppercase tracking-widest mb-2 opacity-70 stats-text">Auto Restart</label>
                     <div class="flex items-center gap-4 mb-2">
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -757,7 +817,7 @@
                             <option value="24h">24 Hours</option>
                         </select>
                     </div>
-                    
+
                     <div id="restart-countdown" class="text-xs mb-6 font-mono opacity-70 stats-text"></div>
 
                     <button onclick="saveConfig()" class="w-full theme-gradient theme-gradient-hover text-white font-bold py-3 rounded-xl transition">SAVE CHANGES</button>
@@ -766,6 +826,7 @@
         </div>
     </div>
 
+    <!-- ============ CREATE FILE MODAL ============ -->
     <div id="createFileModal" class="hidden fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="card-bg w-full max-w-lg rounded-2xl p-6 modal-enter">
             <h3 class="text-white font-bold text-lg mb-4">Create New File</h3>
@@ -782,6 +843,7 @@
         </div>
     </div>
 
+    <!-- ============ EDIT FILE MODAL ============ -->
     <div id="editModal" class="hidden fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="card-bg w-full max-w-3xl h-[80vh] rounded-2xl flex flex-col modal-enter">
             <div class="p-4 border-b flex justify-between items-center" style="border-color: var(--primary);">
@@ -796,19 +858,79 @@
         </div>
     </div>
 
+    <!-- ============ FULLSCREEN LOG MODAL ============ -->
+    <div id="fslogModal" class="hidden fixed inset-0 bg-black flex flex-col">
+        <div class="flex justify-between items-center p-3 border-b flex-wrap gap-2"
+             style="border-color: var(--primary); background: var(--card-bg);">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-terminal text-xl" style="color: var(--primary);"></i>
+                <span class="text-base font-bold text-white" id="fslog-title">Server Logs</span>
+                <span id="fslog-status" class="text-[10px] px-2 py-0.5 rounded font-bold"
+                      style="background: rgba(0,255,0,0.15); color: var(--primary); border: 1px solid var(--primary);">
+                    ● LIVE
+                </span>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+                <button onclick="toggleFslogPause()" id="fslog-pause-btn"
+                        class="px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1"
+                        style="background: rgba(0,0,0,0.3); color: yellow; border: 1px solid yellow;">
+                    <i class="fas fa-pause" id="fslog-pause-icon"></i>
+                    <span id="fslog-pause-text">Pause</span>
+                </button>
+                <button onclick="clearFslog()"
+                        class="px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1"
+                        style="background: rgba(0,0,0,0.3); color: cyan; border: 1px solid cyan;">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button onclick="copyFslog()"
+                        class="px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1"
+                        style="background: rgba(0,0,0,0.3); color: white; border: 1px solid white;">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button onclick="stopServerFromFslog()"
+                        class="px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1"
+                        style="background: rgba(255,0,0,0.2); color: var(--danger); border: 1px solid var(--danger);">
+                    <i class="fas fa-stop"></i> Stop Server
+                </button>
+                <button onclick="closeFslog()"
+                        class="px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1"
+                        style="background: rgba(0,0,0,0.6); color: white; border: 1px solid white;">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+
+        <pre id="fslog-content" class="flex-1 p-4 overflow-auto font-mono whitespace-pre-wrap break-words">Loading...</pre>
+
+        <div class="p-3 border-t flex gap-2"
+             style="border-color: var(--primary); background: var(--card-bg);">
+            <input id="fslog-input" type="text"
+                   placeholder="Send command to stdin and press Enter..."
+                   class="flex-1 bg-black border rounded-lg px-4 py-2 text-white text-sm outline-none"
+                   style="border-color: var(--primary);">
+            <button onclick="sendFslogCommand()"
+                    class="px-5 py-2 rounded-lg font-bold text-sm"
+                    style="background: var(--primary); color: #000;">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </div>
+    </div>
+
     <script>
+        // ============ MATRIX BACKGROUND ============
         function createMatrix() {
             const matrix = document.getElementById('matrix');
             if (!matrix) return;
+            matrix.innerHTML = '';
             const columns = Math.floor(window.innerWidth / 20);
-            
+
             for (let i = 0; i < columns; i++) {
                 const column = document.createElement('div');
                 column.className = 'matrix-column';
                 column.style.left = i * 20 + 'px';
                 column.style.animationDuration = Math.random() * 5 + 3 + 's';
                 column.style.animationDelay = Math.random() * 5 + 's';
-                
+
                 const chars = '01アイウエオカキクケコサシスセソタチツテト';
                 let text = '';
                 for (let j = 0; j < 20; j++) {
@@ -819,38 +941,41 @@
             }
         }
         createMatrix();
+        window.addEventListener('resize', () => { createMatrix(); });
 
+        // ============ SIDEBAR & NAVIGATION ============
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('open');
         }
 
-        function switchMainView(view) {
+        function switchMainView(view, element) {
             document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
             document.getElementById(view + '-view').classList.add('active');
-            
+
             document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            
+            if (element) element.classList.add('active');
+
             toggleSidebar();
         }
 
+        // ============ THEME ============
         function previewTheme(theme) {
             document.getElementById('theme-mode').value = theme;
-            
+
             const colors = {
-                matrix: { primary: '#00ff00', secondary: '#00cc00', accent: '#00ff80', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff0000', header_text: '#ffffff', stats_text: '#ffffff' },
-                night: { primary: '#4d88ff', secondary: '#3366cc', accent: '#aa88ff', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d', header_text: '#ffffff', stats_text: '#ffffff' },
-                ocean: { primary: '#3399ff', secondary: '#0066cc', accent: '#ff99cc', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d', header_text: '#ffffff', stats_text: '#ffffff' },
-                sunset: { primary: '#ff9933', secondary: '#cc6600', accent: '#ff66b3', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d', header_text: '#ffffff', stats_text: '#ffffff' },
-                blood: { primary: '#ff4d4d', secondary: '#cc0000', accent: '#ff80bf', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff0000', header_text: '#ffffff', stats_text: '#ffffff' },
-                neon: { primary: '#ff66ff', secondary: '#cc33cc', accent: '#ffff80', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d', header_text: '#ffffff', stats_text: '#ffffff' },
-                cyber: { primary: '#33ffff', secondary: '#00cccc', accent: '#ff80ff', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d', header_text: '#ffffff', stats_text: '#ffffff' },
-                vapor: { primary: '#ff99ff', secondary: '#cc66cc', accent: '#80ffff', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d', header_text: '#ffffff', stats_text: '#ffffff' },
-                gold: { primary: '#ffcc66', secondary: '#cc9933', accent: '#ffb380', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d', header_text: '#ffffff', stats_text: '#ffffff' },
-                silver: { primary: '#b3b3b3', secondary: '#808080', accent: '#cccccc', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d', header_text: '#ffffff', stats_text: '#ffffff' }
+                matrix: { primary: '#00ff00', secondary: '#00cc00', accent: '#00ff80', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff0000' },
+                night: { primary: '#4d88ff', secondary: '#3366cc', accent: '#aa88ff', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d' },
+                ocean: { primary: '#3399ff', secondary: '#0066cc', accent: '#ff99cc', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d' },
+                sunset: { primary: '#ff9933', secondary: '#cc6600', accent: '#ff66b3', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d' },
+                blood: { primary: '#ff4d4d', secondary: '#cc0000', accent: '#ff80bf', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff0000' },
+                neon: { primary: '#ff66ff', secondary: '#cc33cc', accent: '#ffff80', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d' },
+                cyber: { primary: '#33ffff', secondary: '#00cccc', accent: '#ff80ff', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d' },
+                vapor: { primary: '#ff99ff', secondary: '#cc66cc', accent: '#80ffff', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d' },
+                gold: { primary: '#ffcc66', secondary: '#cc9933', accent: '#ffb380', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d' },
+                silver: { primary: '#b3b3b3', secondary: '#808080', accent: '#cccccc', background: '#000000', card_bg: '#0a0a0a', text: '#ffffff', danger: '#ff4d4d' }
             };
-            
+
             if (colors[theme]) {
                 const c = colors[theme];
                 document.documentElement.style.setProperty('--primary', c.primary);
@@ -860,19 +985,24 @@
                 document.documentElement.style.setProperty('--card-bg', c.card_bg);
                 document.documentElement.style.setProperty('--text', c.text);
                 document.documentElement.style.setProperty('--danger', c.danger);
-                document.documentElement.style.setProperty('--header-text', c.header_text);
-                document.documentElement.style.setProperty('--stats-text', c.stats_text);
             }
         }
 
         function saveTheme() {
             const theme = document.getElementById('theme-mode').value;
             const fontFamily = document.getElementById('font-family').value;
-            
+            const adminPass = document.getElementById('theme-admin-password').value;
+
+            if (!adminPass) {
+                alert('Admin password is required to save theme!');
+                return;
+            }
+
             const fd = new FormData();
             fd.append('theme', theme);
             fd.append('font_family', fontFamily);
-            
+            fd.append('admin_password', adminPass);
+
             fetch('/update_config', { method: 'POST', body: fd })
                 .then(res => res.json())
                 .then(data => {
@@ -883,11 +1013,10 @@
                         alert('Error: ' + (data.error || 'Unknown error'));
                     }
                 })
-                .catch(err => {
-                    alert('Failed to save theme: ' + err);
-                });
+                .catch(err => alert('Failed to save theme: ' + err));
         }
 
+        // ============ PASSWORD TOGGLE ============
         function togglePasswordField(fieldId, icon) {
             const field = document.getElementById(fieldId);
             if (field.type === 'password') {
@@ -901,24 +1030,23 @@
             }
         }
 
+        // ============ COPY LOG ============
         function copyLog(elementId) {
             const pre = document.getElementById(elementId);
             if (pre) {
                 const text = pre.textContent || pre.innerText;
-                navigator.clipboard.writeText(text).then(() => {
-                    // silent copy
-                }).catch(err => {
-                    console.error('Copy failed:', err);
-                });
+                navigator.clipboard.writeText(text).catch(err => console.error('Copy failed:', err));
             }
         }
 
+        // ============ STATE ============
         let currentServer = null;
         let logInterval = null;
         let countdownInterval = null;
         let currentPath = '';
         let currentEditFile = { name: '', path: '' };
 
+        // ============ CREATE MODAL ============
         function toggleModal(show) {
             const modal = document.getElementById('createModal');
             if (show) {
@@ -930,22 +1058,15 @@
             }
         }
 
-        function toggleLog(id) {
-            const box = document.getElementById('log-box-' + id);
-            if (box) box.classList.toggle('hidden');
-            if (!box.classList.contains('hidden')) {
-                forceRefreshLog(id);
-            }
-        }
-
+        // ============ MANAGE SETTINGS ============
         function openSettings(id) {
             currentServer = id;
-            currentPath = ''; 
+            currentPath = '';
             document.getElementById('manage-title').innerText = id;
             document.getElementById('manage-id').innerText = "ID: " + id;
             document.getElementById('manageModal').classList.remove('hidden');
             document.getElementById('manageModal').classList.add('flex');
-            
+
             switchTab('console');
             loadFiles();
             startCountdown();
@@ -955,8 +1076,8 @@
             document.getElementById('manageModal').classList.add('hidden');
             document.getElementById('manageModal').classList.remove('flex');
             currentServer = null;
-            if(logInterval) clearInterval(logInterval);
-            if(countdownInterval) clearInterval(countdownInterval);
+            if (logInterval) clearInterval(logInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
         }
 
         function switchTab(tab) {
@@ -971,10 +1092,10 @@
 
             if (tab === 'console') {
                 refreshLiveLog();
-                if(logInterval) clearInterval(logInterval);
+                if (logInterval) clearInterval(logInterval);
                 logInterval = setInterval(refreshLiveLog, 1500);
             } else {
-                if(logInterval) clearInterval(logInterval);
+                if (logInterval) clearInterval(logInterval);
             }
         }
 
@@ -982,7 +1103,7 @@
             if (!currentServer) return;
             fetch('/get_logs/' + currentServer).then(r => r.json()).then(d => {
                 const el = document.getElementById('live-log');
-                if(d.logs) {
+                if (d.logs) {
                     el.textContent = d.logs;
                     el.scrollTop = el.scrollHeight;
                 }
@@ -992,7 +1113,7 @@
         function sendCommand() {
             const input = document.getElementById('console-input');
             const cmd = input.value;
-            if(!cmd || !currentServer) return;
+            if (!cmd || !currentServer) return;
             const fd = new FormData();
             fd.append('command', cmd);
             fetch('/send_input/' + currentServer, { method: 'POST', body: fd })
@@ -1000,36 +1121,29 @@
                 .then(data => {
                     if (data.status === 'ok') {
                         input.value = '';
-                        // Refresh page after command
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 500);
                     } else {
                         alert('Failed: ' + data.message);
                     }
                 })
-                .catch(err => {
-                    alert('Network error');
-                });
+                .catch(err => alert('Network error'));
         }
-        
-        document.getElementById('console-input')?.addEventListener("keypress", function(e) {
-            if (e.key === "Enter") sendCommand();
+
+        document.getElementById('console-input')?.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendCommand();
         });
 
         function serverAction(action) {
             if (!currentServer) return;
             fetch('/action/' + currentServer + '/' + action).then(() => {
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
+                setTimeout(() => window.location.reload(), 500);
             });
         }
 
+        // ============ FILE MANAGER ============
         function loadFiles(subpath = null) {
             if (!currentServer) return;
             if (subpath !== null) currentPath = subpath;
-            
+
             fetch(`/files/${currentServer}?path=${currentPath}`).then(r => r.json()).then(d => {
                 document.getElementById('config-cmd').value = d.cmd;
                 document.getElementById('config-cwd').value = d.cwd;
@@ -1039,34 +1153,32 @@
 
                 const list = document.getElementById('file-list');
                 list.innerHTML = '';
-                
-                if(currentPath) {
+
+                if (currentPath) {
                     const parent = currentPath.split('/').slice(0, -1).join('/');
                     list.innerHTML += `
-                        <div onclick="loadFiles('${parent}')" class="flex items-center p-3 bg-gray-900/30 rounded-lg cursor-pointer hover:bg-gray-800/50 transition file-item" style="border: 1px solid rgba(255,255,255,0.1);">
-                            <i class="fas fa-level-up-alt mr-3 file-icon"></i> 
+                        <div onclick="loadFiles('${parent}')" class="flex items-center p-3 bg-gray-900/30 rounded-lg cursor-pointer hover:bg-gray-800/50 transition file-item">
+                            <i class="fas fa-level-up-alt mr-3 file-icon"></i>
                             <span class="text-sm file-name">..</span>
                         </div>`;
                 }
-                
-                if(d.files.length === 0) {
+
+                if (d.files.length === 0) {
                     list.innerHTML += '<div class="text-center mt-10 opacity-30">Empty directory</div>';
                 }
 
                 let totalFolderSize = 0;
                 d.files.forEach(f => {
-                    if (f.type === 'file') {
-                        totalFolderSize += f.raw_size || 0;
-                    }
+                    if (f.type === 'file') totalFolderSize += f.raw_size || 0;
                 });
 
                 d.files.forEach(f => {
                     const clickAction = f.type === 'dir' ? `onclick="loadFiles('${currentPath ? currentPath + '/' + f.name : f.name}')"` : '';
-                    
+
                     list.innerHTML += `
-                        <div class="flex justify-between items-center p-3 bg-black/30 rounded-lg hover:bg-black/50 transition group file-item" style="border: 1px solid rgba(255,255,255,0.1);">
+                        <div class="flex justify-between items-center p-3 bg-black/30 rounded-lg hover:bg-black/50 transition group file-item">
                             <div class="${f.type === 'dir' ? 'cursor-pointer' : ''} flex items-center gap-3 overflow-hidden flex-1" ${clickAction}>
-                                <i class="fas ${f.type === 'dir' ? 'fa-folder' : 'fa-file-code'} file-icon" style="opacity: 0.8;"></i>
+                                <i class="fas ${f.type === 'dir' ? 'fa-folder' : 'fa-file-code'} file-icon"></i>
                                 <span class="text-sm truncate file-name">${f.name}</span>
                                 <span class="file-size ml-2">${f.size}</span>
                             </div>
@@ -1075,17 +1187,11 @@
                                     <i class="fas fa-ellipsis-v file-icon"></i>
                                 </button>
                                 <div class="dropdown-menu">
-                                    ${f.type === 'file' ? `
-                                    <button onclick="editFile('${f.name}')"><i class="fas fa-edit"></i>Edit</button>
-                                    ` : ''}
+                                    ${f.type === 'file' ? `<button onclick="editFile('${f.name}')"><i class="fas fa-edit"></i>Edit</button>` : ''}
                                     <button onclick="renameFile('${f.name}')"><i class="fas fa-i-cursor"></i>Rename</button>
                                     <button onclick="copyPath('${f.name}')"><i class="fas fa-copy"></i>Copy Path</button>
-                                    ${f.type === 'file' ? `
-                                    <button onclick="useAsStartCommand('${f.name}')"><i class="fas fa-terminal"></i>Use as Command</button>
-                                    ` : ''}
-                                    ${(f.name.endsWith('.zip') || f.name.endsWith('.7z')) ? `
-                                    <button onclick="extractArchive('${f.name}')"><i class="fas fa-file-archive"></i>Extract</button>
-                                    ` : ''}
+                                    ${f.type === 'file' ? `<button onclick="useAsStartCommand('${f.name}')"><i class="fas fa-terminal"></i>Use as Command</button>` : ''}
+                                    ${(f.name.endsWith('.zip') || f.name.endsWith('.7z')) ? `<button onclick="extractArchive('${f.name}')"><i class="fas fa-file-archive"></i>Extract</button>` : ''}
                                     <a href="/download/${currentServer}/${f.name}?path=${currentPath}"><i class="fas fa-download"></i>Download</a>
                                     <button onclick="deleteFile('${f.name}')" style="color: var(--danger);"><i class="fas fa-trash"></i>Delete</button>
                                 </div>
@@ -1094,17 +1200,12 @@
                     `;
                 });
 
-                // Show total folder size at the bottom
                 if (currentPath && d.files.length > 0) {
                     let totalSizeText = '0 B';
-                    if (totalFolderSize < 1024) {
-                        totalSizeText = totalFolderSize + ' B';
-                    } else if (totalFolderSize < 1024 * 1024) {
-                        totalSizeText = (totalFolderSize / 1024).toFixed(1) + ' KB';
-                    } else {
-                        totalSizeText = (totalFolderSize / (1024 * 1024)).toFixed(1) + ' MB';
-                    }
-                    
+                    if (totalFolderSize < 1024) totalSizeText = totalFolderSize + ' B';
+                    else if (totalFolderSize < 1024 * 1024) totalSizeText = (totalFolderSize / 1024).toFixed(1) + ' KB';
+                    else totalSizeText = (totalFolderSize / (1024 * 1024)).toFixed(1) + ' MB';
+
                     const folderTotal = document.createElement('div');
                     folderTotal.className = 'total-size';
                     folderTotal.innerHTML = `📊 Total Size: ${totalSizeText}`;
@@ -1128,14 +1229,11 @@
         function createNewFile() {
             const filename = document.getElementById('new-filename').value;
             const content = document.getElementById('new-file-content').value;
-            
             if (!filename || !currentServer) return;
-            
             const fd = new FormData();
             fd.append('filename', filename);
             fd.append('path', currentPath);
             fd.append('content', content);
-            
             fetch('/create_file/' + currentServer, { method: 'POST', body: fd })
                 .then(res => res.json())
                 .then(data => {
@@ -1153,19 +1251,21 @@
             const fd = new FormData();
             fd.append('file', input.files[0]);
             fd.append('path', currentPath);
-            
             const btn = input.parentElement;
+            const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            
             fetch('/upload/' + currentServer, { method: 'POST', body: fd }).then(() => {
                 loadFiles();
-                btn.innerHTML = '<i class="fas fa-upload mr-1"></i> Upload <input type="file" id="upload-input" class="hidden" onchange="uploadFile(this)">';
+                btn.innerHTML = originalHTML;
+                // Re-bind the file input
+                const newInput = btn.querySelector('input[type="file"]');
+                if (newInput) newInput.onchange = function () { uploadFile(this); };
             });
         }
 
         function createNewFolder() {
             const name = prompt("Folder Name:");
-            if(name) {
+            if (name) {
                 const fd = new FormData();
                 fd.append('name', name);
                 fd.append('path', currentPath);
@@ -1174,7 +1274,7 @@
         }
 
         function deleteFile(name) {
-            if(confirm('Delete ' + name + '?')) {
+            if (confirm('Delete ' + name + '?')) {
                 fetch(`/delete_file/${currentServer}/${name}?path=${currentPath}`).then(() => loadFiles());
             }
         }
@@ -1189,28 +1289,21 @@
                 fetch('/rename_file/' + currentServer, { method: 'POST', body: fd })
                     .then(res => res.json())
                     .then(data => {
-                        if (data.status === 'ok') {
-                            loadFiles();
-                        } else {
-                            alert('Rename failed: ' + data.error);
-                        }
+                        if (data.status === 'ok') loadFiles();
+                        else alert('Rename failed: ' + data.error);
                     });
             }
         }
 
         function copyPath(filename) {
             const path = currentPath ? currentPath + '/' + filename : filename;
-            navigator.clipboard.writeText(path).then(() => {
-                alert('Path copied: ' + path);
-            });
+            navigator.clipboard.writeText(path).then(() => alert('Path copied: ' + path));
         }
 
         function extractArchive(filename) {
             if (!confirm(`Extract ${filename}?`)) return;
-            
             const fd = new FormData();
             fd.append('path', currentPath);
-            
             fetch(`/extract_archive/${currentServer}/${filename}`, { method: 'POST', body: fd })
                 .then(res => res.json())
                 .then(data => {
@@ -1225,20 +1318,16 @@
 
         function useAsStartCommand(filename) {
             let cmd = '';
-            if (filename.endsWith('.py')) {
-                cmd = 'python ' + filename;
-            } else if (filename.endsWith('.js')) {
-                cmd = 'node ' + filename;
-            } else if (filename.endsWith('.sh')) {
-                cmd = 'bash ' + filename;
-            } else {
-                cmd = './' + filename;
-            }
+            if (filename.endsWith('.py')) cmd = 'python ' + filename;
+            else if (filename.endsWith('.js')) cmd = 'node ' + filename;
+            else if (filename.endsWith('.sh')) cmd = 'bash ' + filename;
+            else cmd = './' + filename;
             document.getElementById('config-cmd').value = cmd;
             document.getElementById('config-cwd').value = currentPath;
             switchTab('config');
         }
 
+        // ============ EDIT FILE ============
         function editFile(filename) {
             currentEditFile = { name: filename, path: currentPath };
             fetch(`/file_content/${currentServer}?filename=${filename}&path=${currentPath}`)
@@ -1266,83 +1355,64 @@
             fd.append('filename', currentEditFile.name);
             fd.append('path', currentEditFile.path);
             fd.append('content', content);
-            
             fetch('/save_file/' + currentServer, { method: 'POST', body: fd })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.status === 'ok') {
-                        closeEditModal();
-                    } else {
-                        alert('Save failed: ' + data.error);
-                    }
+                    if (data.status === 'ok') closeEditModal();
+                    else alert('Save failed: ' + data.error);
                 });
         }
 
+        // ============ PACKAGE ACTIONS ============
         function packageAction(action) {
             const type = document.getElementById('pkg-type').value;
             const name = document.getElementById('pkg-name').value;
-            if(!name) {
-                alert("Enter package name!");
-                return;
-            }
-            
+            if (!name) { alert("Enter package name!"); return; }
             const fd = new FormData();
             fd.append('type', type);
             fd.append('name', name);
-            
             const endpoint = action === 'install' ? '/install_pkg/' : '/uninstall_pkg/';
-            
             fetch(endpoint + currentServer, { method: 'POST', body: fd })
-            .then(() => {
-                document.getElementById('pkg-name').value = '';
-                switchTab('console');
-            });
+                .then(() => {
+                    document.getElementById('pkg-name').value = '';
+                    switchTab('console');
+                });
         }
 
         function globalPackageAction(action) {
             const type = document.getElementById('global-pkg-type').value;
             const name = document.getElementById('global-pkg-name').value;
-            if(!name) {
-                alert("Enter package name!");
-                return;
-            }
-            
+            if (!name) { alert("Enter package name!"); return; }
             const servers = {{ servers|tojson }};
             const serverId = Object.keys(servers)[0];
-            if (!serverId) {
-                alert("No servers available");
-                return;
-            }
-            
+            if (!serverId) { alert("No servers available"); return; }
             const fd = new FormData();
             fd.append('type', type);
             fd.append('name', name);
-            
             const endpoint = action === 'install' ? '/install_pkg/' : '/uninstall_pkg/';
-            
             fetch(endpoint + serverId, { method: 'POST', body: fd })
-            .then(() => {
-                document.getElementById('global-pkg-name').value = '';
-                alert('Package command sent to ' + serverId);
-            });
+                .then(() => {
+                    document.getElementById('global-pkg-name').value = '';
+                    alert('Package command sent to ' + serverId);
+                });
         }
 
+        // ============ CONFIG SAVE ============
         function saveConfig() {
             const cmd = document.getElementById('config-cmd').value;
             const cwd = document.getElementById('config-cwd').value;
             const autoRestart = document.getElementById('config-auto-restart').checked;
             const restartInterval = document.getElementById('config-restart-interval').value;
-            
             const fd = new FormData();
             fd.append('cmd', cmd);
             fd.append('cwd', cwd);
             fd.append('auto_restart', autoRestart);
             fd.append('restart_interval', restartInterval);
-            
             fetch('/update_settings/' + currentServer, { method: 'POST', body: fd })
                 .then(() => alert('Settings Saved!'));
         }
 
+        // ============ COUNTDOWN ============
         function startCountdown() {
             if (countdownInterval) clearInterval(countdownInterval);
             countdownInterval = setInterval(updateCountdown, 1000);
@@ -1360,8 +1430,7 @@
                     }
                     const intervalMap = {
                         '30s': 30, '1m': 60, '5m': 300, '10m': 600, '30m': 1800,
-                        '1h': 3600, '2h': 7200, '3h': 10800, '6h': 21600,
-                        '12h': 43200, '24h': 86400
+                        '1h': 3600, '2h': 7200, '3h': 10800, '6h': 21600, '12h': 43200, '24h': 86400
                     };
                     const intervalSec = intervalMap[data.restart_interval] || 3600;
                     const elapsed = Math.floor(Date.now() / 1000) - data.last_start_time;
@@ -1372,37 +1441,15 @@
                 });
         }
 
-        function forceRefreshLog(id) {
-            fetch('/get_logs/' + id).then(r => r.json()).then(d => {
-                const el = document.getElementById('log-' + id);
-                if (el && d.logs) {
-                    el.textContent = d.logs;
-                    el.scrollTop = el.scrollHeight;
-                }
-            });
-        }
-
-        setInterval(() => {
-            {% for id in servers %}
-            (function() {
-                const box = document.getElementById('log-box-{{ id }}');
-                if (box && !box.classList.contains('hidden')) {
-                    forceRefreshLog('{{ id }}');
-                }
-            })();
-            {% endfor %}
-        }, 2000);
-
+        // ============ TELEGRAM BOT ============
         function deployTelegramBot() {
             const token = document.getElementById('bot-token').value;
             if (!token || !token.includes(':')) {
                 alert('Please enter a valid bot token');
                 return;
             }
-            
             const fd = new FormData();
             fd.append('token', token);
-            
             fetch('/telegram_bot', { method: 'POST', body: fd })
                 .then(res => res.json())
                 .then(data => {
@@ -1413,24 +1460,21 @@
                         alert('Error: ' + data.error);
                     }
                 })
-                .catch(err => {
-                    alert('Network error: ' + err);
-                });
+                .catch(err => alert('Network error: ' + err));
         }
 
+        // ============ SETTINGS ============
         function saveSettings() {
             const adminPassword = document.getElementById('admin-password-settings').value;
             if (!adminPassword) {
                 alert('Admin password is required to save settings!');
                 return;
             }
-
             const fd = new FormData();
             fd.append('site_title', document.getElementById('site-title').value);
             fd.append('site_header', document.getElementById('site-header').value);
             fd.append('icon_url', document.getElementById('icon-url').value);
             fd.append('admin_password', adminPassword);
-
             fetch('/update_config', { method: 'POST', body: fd })
                 .then(res => res.json())
                 .then(data => {
@@ -1447,16 +1491,10 @@
         function changePassword() {
             const current = document.getElementById('current-password').value;
             const newPass = document.getElementById('new-password').value;
-            
-            if (!current || !newPass) {
-                alert('Please fill all fields');
-                return;
-            }
-            
+            if (!current || !newPass) { alert('Please fill all fields'); return; }
             const fd = new FormData();
             fd.append('current_password', current);
             fd.append('new_password', newPass);
-            
             fetch('/change_password', { method: 'POST', body: fd })
                 .then(res => res.json())
                 .then(data => {
@@ -1470,6 +1508,7 @@
                 });
         }
 
+        // ============ SYSTEM STATS ============
         function updateStats() {
             fetch('/system_stats')
                 .then(res => res.json())
@@ -1479,6 +1518,133 @@
                 });
         }
         setInterval(updateStats, 5000);
+
+        // ============ POWER TOGGLE ============
+        function togglePower(serverId, currentStatus, btn) {
+            const action = currentStatus === 'running' ? 'stop' : 'start';
+            btn.style.opacity = '0.4';
+            btn.style.pointerEvents = 'none';
+            fetch(`/action/${serverId}/${action}`)
+                .then(() => location.reload())
+                .catch(() => {
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                });
+        }
+
+        // ============ FULLSCREEN LOG ============
+        let fslogServer = null;
+        let fslogInterval = null;
+        let fslogPaused = false;
+
+        function openFullscreenLog(serverId) {
+            fslogServer = serverId;
+            fslogPaused = false;
+            document.getElementById('fslog-title').textContent = `${serverId} — Live Logs`;
+            document.getElementById('fslog-status').innerHTML = '● LIVE';
+            document.getElementById('fslog-status').style.background = 'rgba(0,255,0,0.15)';
+            document.getElementById('fslog-status').style.color = 'var(--primary)';
+            document.getElementById('fslog-status').style.borderColor = 'var(--primary)';
+            document.getElementById('fslog-content').textContent = 'Loading...';
+            document.getElementById('fslog-pause-text').textContent = 'Pause';
+            document.getElementById('fslog-pause-icon').className = 'fas fa-pause';
+
+            const modal = document.getElementById('fslogModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+
+            refreshFslog();
+            if (fslogInterval) clearInterval(fslogInterval);
+            fslogInterval = setInterval(refreshFslog, 1000);
+        }
+
+        function refreshFslog() {
+            if (!fslogServer || fslogPaused) return;
+            fetch('/get_logs/' + fslogServer)
+                .then(r => r.json())
+                .then(d => {
+                    const el = document.getElementById('fslog-content');
+                    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+                    el.textContent = d.logs || '(no logs)';
+                    if (atBottom) el.scrollTop = el.scrollHeight;
+                })
+                .catch(() => {});
+        }
+
+        function toggleFslogPause() {
+            fslogPaused = !fslogPaused;
+            const icon = document.getElementById('fslog-pause-icon');
+            const text = document.getElementById('fslog-pause-text');
+            const status = document.getElementById('fslog-status');
+            if (fslogPaused) {
+                icon.className = 'fas fa-play';
+                text.textContent = 'Resume';
+                status.innerHTML = '⏸ PAUSED';
+                status.style.background = 'rgba(255,255,0,0.15)';
+                status.style.color = 'yellow';
+                status.style.borderColor = 'yellow';
+            } else {
+                icon.className = 'fas fa-pause';
+                text.textContent = 'Pause';
+                status.innerHTML = '● LIVE';
+                status.style.background = 'rgba(0,255,0,0.15)';
+                status.style.color = 'var(--primary)';
+                status.style.borderColor = 'var(--primary)';
+                refreshFslog();
+            }
+        }
+
+        function clearFslog() {
+            document.getElementById('fslog-content').textContent = '';
+        }
+
+        function copyFslog() {
+            const text = document.getElementById('fslog-content').textContent;
+            navigator.clipboard.writeText(text).catch(() => {});
+        }
+
+        function closeFslog() {
+            document.getElementById('fslogModal').classList.add('hidden');
+            document.getElementById('fslogModal').classList.remove('flex');
+            document.body.style.overflow = '';
+            if (fslogInterval) clearInterval(fslogInterval);
+            fslogInterval = null;
+            fslogServer = null;
+        }
+
+        function sendFslogCommand() {
+            if (!fslogServer) return;
+            const input = document.getElementById('fslog-input');
+            const cmd = input.value.trim();
+            if (!cmd) return;
+            const fd = new FormData();
+            fd.append('command', cmd);
+            fetch('/send_input/' + fslogServer, { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.status === 'ok') input.value = '';
+                    else alert('Failed: ' + d.message);
+                });
+        }
+
+        document.getElementById('fslog-input')?.addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendFslogCommand();
+        });
+
+        function stopServerFromFslog() {
+            if (!fslogServer) return;
+            if (!confirm('Stop this server?')) return;
+            fetch(`/action/${fslogServer}/stop`)
+                .then(() => location.reload());
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                const m = document.getElementById('fslogModal');
+                if (m && !m.classList.contains('hidden')) closeFslog();
+            }
+        });
     </script>
 </body>
 </html>
