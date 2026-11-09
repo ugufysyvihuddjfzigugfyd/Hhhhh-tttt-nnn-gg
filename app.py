@@ -1,16 +1,18 @@
 import os
+import re
 import signal
 import subprocess
 import threading
 import time
 import shutil
 import zipfile
-import py7zr #not available in some site
+import py7zr  # not available in some site
 import psutil
 import json
 import hashlib
 import secrets
-from flask import Flask, render_template, request, jsonify, redirect, url_for, send_file, session
+import requests as http_requests
+from flask import Flask, render_template, request, jsonify, redirect, url_for, send_file, session, Response
 from functools import wraps
 
 app = Flask(__name__)
@@ -33,6 +35,22 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 # Default icon
 DEFAULT_ICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%2300ff00'%3E%3Cpath d='M20 9V7c0-1.1-.9-2-2-2h-4c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-2h-2v2H6V5h4v2h8v2h2z'/%3E%3C/svg%3E"
+
+# Reserved names that conflict with Flask routes
+RESERVED_NAMES = {
+    'login', 'logout', 'static', 'create_server', 'action', 'files',
+    'upload', 'download', 'delete_file', 'create_file', 'create_folder',
+    'save_file', 'file_content', 'rename_file', 'extract_archive',
+    'get_logs', 'send_input', 'update_settings', 'install_pkg',
+    'uninstall_pkg', 'telegram_bot', 'update_config', 'change_password',
+    'server_info', 'system_stats', 'ping', 'json', 'live', 'favicon.ico'
+}
+
+def slugify_server_name(name: str) -> str:
+    """MAHIR JOD -> MAHIRJOD ; only [A-Za-z0-9_-] kept"""
+    if not name:
+        return ''
+    return re.sub(r'[^a-zA-Z0-9_-]', '', name.replace(' ', ''))
 
 # Default configuration with bright colors
 DEFAULT_CONFIG = {
@@ -223,7 +241,8 @@ def save_servers():
                 'auto_restart': s.get('auto_restart', False),
                 'restart_interval': s.get('restart_interval', '1h'),
                 'status': s.get('status', 'stopped'),
-                'last_start_time': s.get('last_start_time', 0)
+                'last_start_time': s.get('last_start_time', 0),
+                'port': s.get('port')
             }
         with open(DB_FILE, 'w') as f:
             json.dump(data, f, indent=2)
@@ -246,7 +265,8 @@ def load_servers():
                         'logs': ["Restored from previous session..."],
                         'status': s.get('status', 'stopped'),
                         'path': s.get('path', ''),
-                        'last_start_time': s.get('last_start_time', 0)
+                        'last_start_time': s.get('last_start_time', 0),
+                        'port': s.get('port')
                     }
         except Exception as e:
             print(f"Error loading servers: {e}")
@@ -302,10 +322,11 @@ def log_monitor(server_id, proc_obj):
             proc_obj.stdout.close()
         except:
             pass
-    
+
     if server_id in SERVERS and SERVERS[server_id].get('process') == proc_obj:
         SERVERS[server_id]['status'] = 'stopped'
         SERVERS[server_id]['process'] = None
+        SERVERS[server_id]['port'] = None
         SERVERS[server_id]['logs'].append(">>> Process terminated.")
         save_servers()
 
@@ -315,21 +336,21 @@ def kill_process_completely(proc):
             return
         parent = psutil.Process(proc.pid)
         children = parent.children(recursive=True)
-        
+
         for child in children:
             try:
                 child.terminate()
             except:
                 pass
-        
+
         gone, alive = psutil.wait_procs(children, timeout=3)
-        
+
         for child in alive:
             try:
                 child.kill()
             except:
                 pass
-        
+
         try:
             parent.terminate()
             parent.wait(timeout=3)
@@ -346,10 +367,10 @@ def run_install_command(server_id, command):
         SERVERS[server_id]['logs'].append(f">>> {command}")
         try:
             process = subprocess.Popen(
-                command, 
-                shell=True, 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.STDOUT, 
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
                 text=True,
                 bufsize=1
             )
@@ -365,6 +386,8 @@ def run_install_command(server_id, command):
 def start_server_internal(server_id, server):
     if server['status'] == 'running':
         return True
+
+    server['port'] = None  # reset port on every start
 
     env = os.environ.copy()
     env["PYTHONUNBUFFERED"] = "1"
@@ -399,7 +422,7 @@ def start_server_internal(server_id, server):
         server['status'] = 'running'
         server['last_start_time'] = time.time()
         server['logs'].append(f">>> Server started at {time.strftime('%Y-%m-%d %H:%M:%S')}")
-        
+
         threading.Thread(target=log_monitor, args=(server_id, proc), daemon=True).start()
         save_servers()
         return True
@@ -416,25 +439,78 @@ def auto_restarter():
                 if server.get('status') == 'running' and server.get('auto_restart'):
                     interval_str = server.get('restart_interval', '1h')
                     interval_map = {
-                        '30s': 30, '1m': 60, '5m': 300, '10m': 600, '30m': 1800, 
-                        '1h': 3600, '2h': 7200, '3h': 10800, '6h': 21600, 
+                        '30s': 30, '1m': 60, '5m': 300, '10m': 600, '30m': 1800,
+                        '1h': 3600, '2h': 7200, '3h': 10800, '6h': 21600,
                         '12h': 43200, '24h': 86400
                     }
                     interval_sec = interval_map.get(interval_str, 3600)
                     last_start = server.get('last_start_time', current_time)
-                    
+
                     if current_time - last_start >= interval_sec:
                         server['logs'].append(f">>> Auto-restarting server (Interval: {interval_str})...")
                         if server.get('process'):
                             kill_process_completely(server['process'])
                             server['process'] = None
                         server['status'] = 'stopped'
+                        server['port'] = None
                         start_server_internal(server_id, server)
             except Exception as e:
                 print(f"Error in auto_restarter for {server_id}: {e}")
 
 restarter_thread = threading.Thread(target=auto_restarter, daemon=True)
 restarter_thread.start()
+
+# --- AUTO PORT DETECTION THREAD ---
+def _listening_ports_for_pid(pid):
+    ports = []
+    try:
+        proc = psutil.Process(pid)
+        for conn in proc.net_connections(kind='tcp'):
+            if conn.status == 'LISTEN' and conn.laddr and conn.laddr.port:
+                if conn.laddr.port not in ports:
+                    ports.append(conn.laddr.port)
+    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        pass
+    except Exception:
+        pass
+    return ports
+
+def port_detector_loop():
+    while True:
+        try:
+            for sid, server in list(SERVERS.items()):
+                if server.get('status') != 'running' or not server.get('process'):
+                    continue
+                try:
+                    pid = server['process'].pid
+                    parent = psutil.Process(pid)
+                    pids = [pid] + [c.pid for c in parent.children(recursive=True)]
+                    found = None
+                    for p in pids:
+                        ports = _listening_ports_for_pid(p)
+                        if ports:
+                            found = sorted(ports)[0]
+                            break
+                    old = server.get('port')
+                    if found and found != old:
+                        server['port'] = found
+                        server['logs'].append(
+                            f">>> 🌐 Live on port {found} — URL: /{sid}"
+                        )
+                        if len(server['logs']) > 1000:
+                            server['logs'] = server['logs'][-900:]
+                        save_servers()
+                    elif not found and old:
+                        server['port'] = None
+                        save_servers()
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    pass
+        except Exception as e:
+            print(f"Port detector error: {e}")
+        time.sleep(3)
+
+port_thread = threading.Thread(target=port_detector_loop, daemon=True)
+port_thread.start()
 
 # --- AUTH ROUTES ---
 @app.route('/login', methods=['GET', 'POST'])
@@ -443,7 +519,7 @@ def login():
         if request.method == 'POST':
             password = request.form.get('password')
             hashed_input = hashlib.sha256(password.encode()).hexdigest()
-            
+
             if hashed_input == CONFIG['passwords']['secret']:
                 session['logged_in'] = True
                 session['is_secret'] = True
@@ -454,7 +530,7 @@ def login():
                 return redirect(url_for('index'))
             else:
                 return render_template('login.html', error="Invalid password", config=CONFIG)
-        
+
         return render_template('login.html', config=CONFIG)
     except Exception as e:
         print(f"Login error: {e}")
@@ -472,7 +548,7 @@ def index():
     try:
         cpu, ram, disk = get_system_stats()
         current_colors = CONFIG['colors'].get(CONFIG['theme'], CONFIG['colors']['matrix'])
-        
+
         serializable_servers = {}
         for sid, s in SERVERS.items():
             serializable_servers[sid] = {
@@ -482,12 +558,13 @@ def index():
                 'restart_interval': s.get('restart_interval', '1h'),
                 'status': s.get('status', 'stopped'),
                 'path': s.get('path', ''),
-                'last_start_time': s.get('last_start_time', 0)
+                'last_start_time': s.get('last_start_time', 0),
+                'port': s.get('port')
             }
-        
-        return render_template('index.html', 
+
+        return render_template('index.html',
                              servers=serializable_servers,
-                             cpu=cpu, 
+                             cpu=cpu,
                              ram=ram,
                              disk=disk,
                              total_count=len(SERVERS),
@@ -503,12 +580,17 @@ def index():
 @login_required
 def create_server():
     try:
-        server_name = request.form.get('server_name').strip().replace(" ", "_")
-        start_command = request.form.get('start_command').strip()
+        raw_name = (request.form.get('server_name') or '').strip()
+        start_command = (request.form.get('start_command') or '').strip()
 
-        if not server_name:
+        if not raw_name:
             return "Server name required", 400
-        
+
+        server_name = slugify_server_name(raw_name)
+        if not server_name:
+            return "Server name must contain letters or numbers", 400
+        if server_name.lower() in RESERVED_NAMES:
+            return f"Name '{server_name}' is reserved", 400
         if server_name in SERVERS:
             return "Server name already exists", 400
 
@@ -519,14 +601,14 @@ def create_server():
         if file and file.filename:
             file_path = os.path.join(server_path, file.filename)
             file.save(file_path)
-            
+
             if file.filename.lower().endswith('.zip'):
                 try:
                     with zipfile.ZipFile(file_path, 'r') as zip_ref:
                         zip_ref.extractall(server_path)
                 except Exception as e:
                     print(f"Zip extraction error: {e}")
-                    
+
             elif file.filename.lower().endswith('.7z'):
                 try:
                     with py7zr.SevenZipFile(file_path, mode='r') as sz:
@@ -535,15 +617,16 @@ def create_server():
                     print(f"7z extraction error: {e}")
 
         SERVERS[server_name] = {
-            'process': None, 
-            'cmd': start_command, 
-            'cwd': '', 
+            'process': None,
+            'cmd': start_command,
+            'cwd': '',
             'logs': [f">>> Server '{server_name}' created at {time.strftime('%Y-%m-%d %H:%M:%S')}"],
-            'auto_restart': False, 
-            'restart_interval': '1h', 
+            'auto_restart': False,
+            'restart_interval': '1h',
             'last_start_time': 0,
-            'status': 'stopped', 
-            'path': server_path
+            'status': 'stopped',
+            'path': server_path,
+            'port': None
         }
         save_servers()
         return redirect(url_for('index'))
@@ -557,7 +640,7 @@ def server_action(server_id, action):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         server = SERVERS[server_id]
 
         if action == 'start':
@@ -569,15 +652,17 @@ def server_action(server_id, action):
                 kill_process_completely(server['process'])
                 server['process'] = None
             server['status'] = 'stopped'
+            server['port'] = None
             server['logs'].append(f">>> Stopped by user at {time.strftime('%Y-%m-%d %H:%M:%S')}")
             save_servers()
             return redirect(url_for('index'))
-            
+
         elif action == 'restart':
             if server['process']:
                 kill_process_completely(server['process'])
                 server['process'] = None
             server['status'] = 'stopped'
+            server['port'] = None
             server['logs'].append(">>> Manual restart triggered...")
             time.sleep(1)
             start_server_internal(server_id, server)
@@ -587,10 +672,10 @@ def server_action(server_id, action):
             if server['process']:
                 kill_process_completely(server['process'])
                 server['process'] = None
-            
+
             if os.path.exists(server['path']):
                 shutil.rmtree(server['path'], ignore_errors=True)
-            
+
             del SERVERS[server_id]
             save_servers()
             return redirect(url_for('index'))
@@ -604,6 +689,87 @@ def server_action(server_id, action):
             SERVERS[server_id]['logs'].append(f"Error during {action}: {str(e)}")
         return redirect(url_for('index'))
 
+# --- LIVE REVERSE PROXY ---
+def _proxy_to_live(server_id, subpath):
+    server = SERVERS.get(server_id)
+    if not server:
+        return jsonify({'error': 'Server not found'}), 404
+
+    if server.get('status') != 'running':
+        return render_template('live_offline.html', server_id=server_id,
+                               reason='stopped', config=CONFIG), 503
+
+    port = server.get('port')
+    if not port:
+        return render_template('live_offline.html', server_id=server_id,
+                               reason='no_port', config=CONFIG), 503
+
+    target = f"http://127.0.0.1:{port}/{subpath}"
+    if request.query_string:
+        target += '?' + request.query_string.decode('utf-8', errors='ignore')
+
+    fwd_headers = {}
+    for k, v in request.headers:
+        if k.lower() in ('host', 'content-length', 'connection', 'accept-encoding'):
+            continue
+        fwd_headers[k] = v
+    fwd_headers['Accept-Encoding'] = 'identity'
+    fwd_headers['X-Forwarded-For'] = request.remote_addr or '127.0.0.1'
+    fwd_headers['X-Forwarded-Proto'] = request.scheme
+    fwd_headers['X-Forwarded-Prefix'] = f'/{server_id}'
+
+    try:
+        upstream = http_requests.request(
+            method=request.method,
+            url=target,
+            headers=fwd_headers,
+            data=request.get_data(),
+            allow_redirects=False,
+            timeout=60,
+            stream=False,
+        )
+    except http_requests.exceptions.ConnectionError:
+        return render_template('live_offline.html', server_id=server_id,
+                               reason='not_responding', config=CONFIG), 502
+    except http_requests.exceptions.Timeout:
+        return "Upstream timeout", 504
+    except Exception as e:
+        return f"Proxy error: {e}", 502
+
+    excluded = {'content-encoding', 'content-length', 'transfer-encoding', 'connection'}
+    out_headers = []
+    for k, v in upstream.raw.headers.items():
+        if k.lower() in excluded:
+            continue
+        # Rewrite Set-Cookie path so cookies work under /<server_id>
+        if k.lower() == 'set-cookie':
+            v = re.sub(r'(?i)path=/[^;]*', f'path=/{server_id}', v)
+            if 'path=' not in v.lower():
+                v = v + f'; Path=/{server_id}'
+        out_headers.append((k, v))
+
+    return Response(upstream.content, status=upstream.status_code, headers=out_headers)
+
+@app.route('/live/<server_id>', defaults={'subpath': ''},
+           methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'])
+@app.route('/live/<server_id>/<path:subpath>',
+           methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'])
+@login_required
+def live_prefixed(server_id, subpath):
+    return _proxy_to_live(server_id, subpath)
+
+@app.route('/<server_id>', defaults={'subpath': ''},
+           methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'])
+@app.route('/<server_id>/<path:subpath>',
+           methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'])
+@login_required
+def live_direct(server_id, subpath):
+    if server_id not in SERVERS:
+        if request.method == 'GET':
+            return redirect(url_for('index'))
+        return jsonify({'error': 'Not found'}), 404
+    return _proxy_to_live(server_id, subpath)
+
 # --- FILE MANAGEMENT ---
 @app.route('/rename_file/<server_id>', methods=['POST'])
 @login_required
@@ -611,31 +777,31 @@ def rename_file(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         old_name = request.form.get('old_name')
         new_name = request.form.get('new_name')
         subpath = request.form.get('path', '')
-        
+
         if not old_name or not new_name:
             return jsonify({'error': 'Missing names'}), 400
-        
+
         subpath = subpath.replace('..', '')
         old_name = old_name.replace('..', '')
         new_name = new_name.replace('..', '')
-        
+
         base_path = SERVERS[server_id]['path']
         old_path = os.path.join(base_path, subpath, old_name)
         new_path = os.path.join(base_path, subpath, new_name)
-        
+
         if not os.path.realpath(old_path).startswith(os.path.realpath(base_path)):
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         if not os.path.exists(old_path):
             return jsonify({'error': 'File not found'}), 404
-        
+
         if os.path.exists(new_path):
             return jsonify({'error': 'Destination already exists'}), 400
-        
+
         os.rename(old_path, new_path)
         return jsonify({'status': 'ok'})
     except Exception as e:
@@ -647,24 +813,24 @@ def file_content(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         filename = request.args.get('filename')
         subpath = request.args.get('path', '')
-        
+
         if not filename:
             return jsonify({'error': 'No filename'}), 400
-        
+
         subpath = subpath.replace('..', '')
         filename = filename.replace('..', '')
-        
+
         file_path = os.path.join(SERVERS[server_id]['path'], subpath, filename)
-        
+
         if not os.path.realpath(file_path).startswith(os.path.realpath(SERVERS[server_id]['path'])):
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         if not os.path.isfile(file_path):
             return jsonify({'error': 'File not found'}), 404
-        
+
         with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
             content = f.read()
         return jsonify({'content': content})
@@ -677,22 +843,22 @@ def save_file(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         filename = request.form.get('filename')
         subpath = request.form.get('path', '')
         content = request.form.get('content')
-        
+
         if not filename or content is None:
             return jsonify({'error': 'Missing data'}), 400
-        
+
         subpath = subpath.replace('..', '')
         filename = filename.replace('..', '')
-        
+
         file_path = os.path.join(SERVERS[server_id]['path'], subpath, filename)
-        
+
         if not os.path.realpath(file_path).startswith(os.path.realpath(SERVERS[server_id]['path'])):
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
@@ -706,25 +872,25 @@ def create_file(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         filename = request.form.get('filename')
         subpath = request.form.get('path', '')
         content = request.form.get('content', '')
-        
+
         if not filename:
             return jsonify({'error': 'Filename required'}), 400
-        
+
         subpath = subpath.replace('..', '')
         filename = filename.replace('..', '')
-        
+
         file_path = os.path.join(SERVERS[server_id]['path'], subpath, filename)
-        
+
         if not os.path.realpath(file_path).startswith(os.path.realpath(SERVERS[server_id]['path'])):
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         if os.path.exists(file_path):
             return jsonify({'error': 'File already exists'}), 400
-        
+
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
@@ -738,33 +904,33 @@ def extract_archive(server_id, filename):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         subpath = request.form.get('path', '')
-        
+
         subpath = subpath.replace('..', '')
         filename = filename.replace('..', '')
-        
+
         archive_path = os.path.join(SERVERS[server_id]['path'], subpath, filename)
-        
+
         if not os.path.realpath(archive_path).startswith(os.path.realpath(SERVERS[server_id]['path'])):
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         if not os.path.exists(archive_path):
             return jsonify({'error': 'Archive not found'}), 404
-        
+
         extract_to = os.path.dirname(archive_path)
-        
+
         if filename.lower().endswith('.zip'):
             with zipfile.ZipFile(archive_path, 'r') as z:
                 z.extractall(extract_to)
-            
+
         elif filename.lower().endswith('.7z'):
             with py7zr.SevenZipFile(archive_path, mode='r') as z:
                 z.extractall(extract_to)
-            
+
         else:
             return jsonify({'error': 'Unsupported archive format'}), 400
-            
+
         return jsonify({'status': 'ok'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -784,18 +950,18 @@ def get_logs(server_id):
 def send_input(server_id):
     try:
         cmd = request.form.get('command')
-        
+
         if not cmd:
             return jsonify({'status': 'error', 'message': 'No command provided'})
-        
+
         if server_id not in SERVERS:
             return jsonify({'status': 'error', 'message': 'Server not found'})
-        
+
         server = SERVERS[server_id]
-        
+
         if not server['process']:
             return jsonify({'status': 'error', 'message': 'Process not running'})
-        
+
         proc = server['process']
         if proc.stdin and not proc.stdin.closed:
             proc.stdin.write(cmd + "\n")
@@ -813,15 +979,15 @@ def list_files(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         subpath = request.args.get('path', '')
-        
+
         if '..' in subpath:
             subpath = ''
-        
+
         base_path = SERVERS[server_id]['path']
         full_path = os.path.join(base_path, subpath)
-        
+
         if not os.path.realpath(full_path).startswith(os.path.realpath(base_path)):
             full_path = base_path
             subpath = ''
@@ -835,19 +1001,19 @@ def list_files(server_id):
         for item in os.listdir(full_path):
             item_path = os.path.join(full_path, item)
             is_file = os.path.isfile(item_path)
-            
+
             size = 0
             if is_file:
                 size = os.path.getsize(item_path)
                 total_size += size
-            
+
             if size < 1024:
                 size_str = f"{size} B"
             elif size < 1024 * 1024:
                 size_str = f"{size/1024:.1f} KB"
             else:
                 size_str = f"{size/(1024*1024):.1f} MB"
-            
+
             files.append({
                 'name': item,
                 'size': size_str,
@@ -855,7 +1021,7 @@ def list_files(server_id):
                 'type': 'file' if is_file else 'dir',
                 'ext': os.path.splitext(item)[1].lower() if is_file else ''
             })
-        
+
         # Calculate folder total size
         if total_size < 1024:
             total_size_str = f"{total_size} B"
@@ -863,7 +1029,7 @@ def list_files(server_id):
             total_size_str = f"{total_size/1024:.1f} KB"
         else:
             total_size_str = f"{total_size/(1024*1024):.1f} MB"
-        
+
         files.sort(key=lambda x: (x['type'] != 'dir', x['name'].lower()))
 
         return jsonify({
@@ -873,7 +1039,8 @@ def list_files(server_id):
             'auto_restart': SERVERS[server_id].get('auto_restart', False),
             'restart_interval': SERVERS[server_id].get('restart_interval', '1h'),
             'current_path': subpath,
-            'total_size': total_size_str
+            'total_size': total_size_str,
+            'port': SERVERS[server_id].get('port')
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -884,25 +1051,25 @@ def upload_file(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         file = request.files.get('file')
         subpath = request.form.get('path', '')
-        
+
         if '..' in subpath:
             subpath = ''
-        
+
         if not file or not file.filename:
             return jsonify({'error': 'No file provided'}), 400
-        
+
         target_dir = os.path.join(SERVERS[server_id]['path'], subpath)
-        
+
         if not os.path.realpath(target_dir).startswith(os.path.realpath(SERVERS[server_id]['path'])):
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         os.makedirs(target_dir, exist_ok=True)
         file_path = os.path.join(target_dir, file.filename)
         file.save(file_path)
-        
+
         if file.filename.lower().endswith('.zip'):
             try:
                 with zipfile.ZipFile(file_path, 'r') as z:
@@ -910,7 +1077,7 @@ def upload_file(server_id):
                 return jsonify({'status': 'ok', 'message': 'File uploaded and extracted successfully'})
             except Exception as e:
                 return jsonify({'status': 'ok', 'warning': f'File uploaded but extraction failed: {str(e)}'})
-                
+
         elif file.filename.lower().endswith('.7z'):
             try:
                 with py7zr.SevenZipFile(file_path, mode='r') as z:
@@ -918,7 +1085,7 @@ def upload_file(server_id):
                 return jsonify({'status': 'ok', 'message': 'File uploaded and extracted successfully'})
             except Exception as e:
                 return jsonify({'status': 'ok', 'warning': f'File uploaded but extraction failed: {str(e)}'})
-        
+
         return jsonify({'status': 'ok', 'message': 'File uploaded successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -929,23 +1096,23 @@ def create_folder(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         folder_name = request.form.get('name')
         subpath = request.form.get('path', '')
-        
+
         if '..' in subpath:
             subpath = ''
-        
+
         if not folder_name:
             return jsonify({'error': 'Folder name required'}), 400
-        
+
         folder_name = folder_name.replace('..', '')
-        
+
         target = os.path.join(SERVERS[server_id]['path'], subpath, folder_name)
-        
+
         if not os.path.realpath(target).startswith(os.path.realpath(SERVERS[server_id]['path'])):
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         os.makedirs(target, exist_ok=True)
         return jsonify({'status': 'ok'})
     except Exception as e:
@@ -957,20 +1124,20 @@ def download_file(server_id, filename):
     try:
         if server_id not in SERVERS:
             return "Server not found", 404
-        
+
         subpath = request.args.get('path', '')
-        
+
         if '..' in subpath or '..' in filename:
             return "Invalid path", 400
-        
+
         file_path = os.path.join(SERVERS[server_id]['path'], subpath, filename)
-        
+
         if not os.path.realpath(file_path).startswith(os.path.realpath(SERVERS[server_id]['path'])):
             return "Invalid path", 400
-        
+
         if not os.path.exists(file_path):
             return "File not found", 404
-        
+
         return send_file(file_path, as_attachment=True)
     except Exception as e:
         return str(e), 500
@@ -981,20 +1148,20 @@ def delete_file(server_id, filename):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         subpath = request.args.get('path', '')
-        
+
         if '..' in subpath or '..' in filename:
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         file_path = os.path.join(SERVERS[server_id]['path'], subpath, filename)
-        
+
         if not os.path.realpath(file_path).startswith(os.path.realpath(SERVERS[server_id]['path'])):
             return jsonify({'error': 'Invalid path'}), 400
-        
+
         if not os.path.exists(file_path):
             return jsonify({'error': 'File not found'}), 404
-        
+
         if os.path.isdir(file_path):
             shutil.rmtree(file_path)
         else:
@@ -1009,19 +1176,19 @@ def update_settings(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         cmd = request.form.get('cmd', '').strip()
         cwd = request.form.get('cwd', '').strip()
         auto_restart = request.form.get('auto_restart') == 'true'
         restart_interval = request.form.get('restart_interval', '1h')
-        
+
         SERVERS[server_id]['cmd'] = cmd
         SERVERS[server_id]['cwd'] = cwd
         SERVERS[server_id]['auto_restart'] = auto_restart
         SERVERS[server_id]['restart_interval'] = restart_interval
-        
+
         SERVERS[server_id]['logs'].append(f">>> Settings updated at {time.strftime('%Y-%m-%d %H:%M:%S')}")
-        
+
         save_servers()
         return jsonify({'status': 'ok'})
     except Exception as e:
@@ -1034,13 +1201,13 @@ def install_pkg(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         pkg_type = request.form.get('type')
         pkg_name = request.form.get('name')
-        
+
         if not pkg_name:
             return jsonify({'error': 'Package name required'}), 400
-        
+
         cmd = ""
         if pkg_type == 'pip':
             cmd = f"pip install {pkg_name}"
@@ -1052,7 +1219,7 @@ def install_pkg(server_id):
             cmd = f"npm install -g {pkg_name}"
         else:
             return jsonify({'error': 'Invalid package type'}), 400
-        
+
         threading.Thread(target=run_install_command, args=(server_id, cmd), daemon=True).start()
         return jsonify({'status': 'ok'})
     except Exception as e:
@@ -1064,13 +1231,13 @@ def uninstall_pkg(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Server not found'}), 404
-        
+
         pkg_type = request.form.get('type')
         pkg_name = request.form.get('name')
-        
+
         if not pkg_name:
             return jsonify({'error': 'Package name required'}), 400
-        
+
         cmd = ""
         if pkg_type == 'pip':
             cmd = f"pip uninstall -y {pkg_name}"
@@ -1082,7 +1249,7 @@ def uninstall_pkg(server_id):
             cmd = f"npm uninstall -g {pkg_name}"
         else:
             return jsonify({'error': 'Invalid package type'}), 400
-        
+
         threading.Thread(target=run_install_command, args=(server_id, cmd), daemon=True).start()
         return jsonify({'status': 'ok'})
     except Exception as e:
@@ -1096,15 +1263,15 @@ def telegram_bot():
         token = request.form.get('token')
         if not token:
             return jsonify({'error': 'Token required'}), 400
-        
+
         if ':' not in token or len(token) < 40:
             return jsonify({'error': 'Invalid token format'}), 400
-        
+
         timestamp = int(time.time())
         server_name = f"tg_bot_{timestamp}"
         server_path = os.path.join(UPLOAD_FOLDER, server_name)
         os.makedirs(server_path, exist_ok=True)
-        
+
         # Fixed bot script with proper imports
         # Updated bot script with pyTelegramBotAPI (safe formatting)
         bot_script = '''import json
@@ -1195,7 +1362,7 @@ def send_api_response(message):
 
     try:
         r = requests.get(url, timeout=15, headers={{'User-Agent': 'MAHIR-TeleBot'}})
-        
+
         # Try to parse as JSON
         try:
             response_data = r.json()
@@ -1228,15 +1395,15 @@ if __name__ == "__main__":
     print(f"⏱ Started at: {{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}}")
     bot.infinity_polling()
 '''.format(token)
-        
+
         script_path = os.path.join(server_path, "bot.py")
         with open(script_path, 'w', encoding='utf-8') as f:
             f.write(bot_script)
-        
+
         # Create requirements
         with open(os.path.join(server_path, "requirements.txt"), 'w') as f:
             f.write("pyTelegramBotAPI==4.14.1\nrequests==2.31.0")
-        
+
         # Create README
         readme = f"""# Telegram Bot - {server_name}
 
@@ -1264,27 +1431,28 @@ Auto-restart enabled - 24/7 uptime
 """
         with open(os.path.join(server_path, "README.txt"), 'w') as f:
             f.write(readme)
-        
+
         SERVERS[server_name] = {
-            'process': None, 
-            'cmd': 'pip install -r requirements.txt && python bot.py', 
-            'cwd': '', 
+            'process': None,
+            'cmd': 'pip install -r requirements.txt && python bot.py',
+            'cwd': '',
             'logs': [
                 f">>> Telegram Bot created at {time.strftime('%Y-%m-%d %H:%M:%S')}",
                 f">>> Token: {token[:10]}...{token[-5:]}",
                 ">>> Use 'Start' to launch the bot"
             ],
-            'auto_restart': True, 
-            'restart_interval': '24h', 
+            'auto_restart': True,
+            'restart_interval': '24h',
             'last_start_time': 0,
-            'status': 'stopped', 
-            'path': server_path
+            'status': 'stopped',
+            'path': server_path,
+            'port': None
         }
-        
+
         save_servers()
-        
+
         return jsonify({
-            'status': 'ok', 
+            'status': 'ok',
             'server_name': server_name,
             'message': 'Bot created successfully! Start it from dashboard.'
         })
@@ -1300,7 +1468,7 @@ def update_config():
         admin_pass = request.form.get('admin_password')
         if not admin_pass:
             return jsonify({'error': 'Admin password required'}), 403
-        
+
         hashed_admin = hashlib.sha256(admin_pass.encode()).hexdigest()
         if hashed_admin != CONFIG['passwords']['secret']:
             return jsonify({'error': 'Invalid admin password'}), 403
@@ -1311,7 +1479,7 @@ def update_config():
         icon_url = request.form.get('icon_url')
         theme = request.form.get('theme')
         font_family = request.form.get('font_family')
-        
+
         if site_title:
             CONFIG['site_title'] = site_title
         if site_header:
@@ -1322,7 +1490,7 @@ def update_config():
             CONFIG['theme'] = theme
         if font_family and font_family in CONFIG['fonts']:
             CONFIG['font_family'] = font_family
-        
+
         save_config(CONFIG)
         return jsonify({'status': 'ok'})
     except Exception as e:
@@ -1334,19 +1502,19 @@ def change_password():
     try:
         current = request.form.get('current_password')
         new = request.form.get('new_password')
-        
+
         if not current or not new:
             return jsonify({'error': 'All fields required'}), 400
-        
+
         hashed_current = hashlib.sha256(current.encode()).hexdigest()
         hashed_new = hashlib.sha256(new.encode()).hexdigest()
-        
+
         # Only secret password can change passwords
         if hashed_current == CONFIG['passwords']['secret']:
             CONFIG['passwords']['user'] = hashed_new
             save_config(CONFIG)
             return jsonify({'status': 'ok', 'message': 'User password updated by admin'})
-        
+
         return jsonify({'error': 'Current password incorrect'}), 403
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -1357,19 +1525,20 @@ def server_info(server_id):
     try:
         if server_id not in SERVERS:
             return jsonify({'error': 'Not found'}), 404
-        
+
         s = SERVERS[server_id]
-        
+
         uptime = 0
         if s['status'] == 'running' and s['last_start_time'] > 0:
             uptime = int(time.time() - s['last_start_time'])
-        
+
         return jsonify({
             'status': s['status'],
             'auto_restart': s.get('auto_restart', False),
             'restart_interval': s.get('restart_interval', '1h'),
             'last_start_time': s.get('last_start_time', 0),
-            'uptime': uptime
+            'uptime': uptime,
+            'port': s.get('port')
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -1413,10 +1582,10 @@ def server_error(e):
 if __name__ == "__main__":
     import multiprocessing
     multiprocessing.freeze_support()
-    
+
     port = int(os.environ.get("PORT", 3000))
     debug = os.environ.get("DEBUG", "False").lower() == "true"
-    
+
     print("=" * 50)
     print("MAHIR PREMIUM VPS - Starting...")
     print("=" * 50)
@@ -1426,10 +1595,11 @@ if __name__ == "__main__":
     print(f"Servers file: {DB_FILE}")
     print(f"Upload folder: {UPLOAD_FOLDER}")
     print(f"Static folder: {STATIC_FOLDER}")
+    print(f"Live proxy: http://<host>:{port}/<SERVERNAME>")
     print("=" * 50)
     print("Default passwords:")
     print("  Secret: KING-GAMER-MAHIR (Can change user password)")
     print("  User: admin (Cannot change password)")
     print("=" * 50)
-    
+
     app.run(host="0.0.0.0", port=port, debug=debug, threaded=True)
